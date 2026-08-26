@@ -15,6 +15,7 @@ const types = {
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
   '.webp': 'image/webp',
+  '.mp3': 'audio/mpeg',
   '.ico': 'image/x-icon',
 };
 
@@ -60,9 +61,10 @@ function serveStatic(req, res, url) {
   if (!file.startsWith(root) || !existsSync(file) || statSync(file).isDirectory()) {
     return send(res, 404, 'Signal lost: asset not found.');
   }
+  const kind = extname(file);
   res.writeHead(200, {
-    'Content-Type': types[extname(file)] || 'application/octet-stream',
-    'Cache-Control': extname(file) === '.png' ? 'public, max-age=86400' : 'no-cache',
+    'Content-Type': types[kind] || 'application/octet-stream',
+    'Cache-Control': kind === '.png' || kind === '.mp3' ? 'public, max-age=86400' : 'no-cache',
   });
   createReadStream(file).pipe(res);
 }

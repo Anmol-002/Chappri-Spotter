@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { applySharedEvent, eventFingerprint, publicWorld, seedWorld } from './public/js/world.js';
+import { applySharedEvent, eventFingerprint, mergeStarterWorld, publicWorld, seedWorld } from './public/js/world.js';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const dataDir = process.env.CHAPPRI_STORE_PATH || join(root, 'data');
@@ -58,7 +58,7 @@ async function loadWorld() {
     const raw = await readFile(worldFile, 'utf8');
     const parsed = JSON.parse(raw);
     if (validWorld(parsed)) {
-      world = parsed;
+      world = mergeStarterWorld(parsed);
       if (!world.voters) world.voters = {};
       return;
     }
@@ -67,7 +67,7 @@ async function loadWorld() {
   }
   const remote = await loadJsonBin();
   if (remote) {
-    world = remote;
+    world = mergeStarterWorld(remote);
     if (!world.voters) world.voters = {};
     return;
   }

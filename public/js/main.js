@@ -67,6 +67,7 @@ $('#layerSelect').onchange = (e) => {
 };
 
 $('#locateButton').onclick = () => {
+  clearLocationSearch();
   const cached = getUserCoords() || readSavedGps();
   toast({
     icon: '📡',
@@ -154,6 +155,13 @@ function closeSearchResults() {
   searchResults.classList.add('hidden');
 }
 
+function clearLocationSearch() {
+  clearTimeout(searchTimer);
+  searchInput.value = '';
+  searchClear.classList.add('hidden');
+  closeSearchResults();
+}
+
 function renderSearchHits(results, query, { loading = false } = {}) {
   if (!results.length && !loading) {
     searchResults.innerHTML = `<div class="search-empty">No places matched “${query}”. Try Bangalore, Koramangala, Cyber Hub…</div>`;
@@ -218,9 +226,7 @@ searchInput?.addEventListener('focus', () => {
 });
 
 searchClear?.addEventListener('click', () => {
-  searchInput.value = '';
-  searchClear.classList.add('hidden');
-  closeSearchResults();
+  clearLocationSearch();
   searchInput.focus();
 });
 
@@ -265,6 +271,7 @@ function updateNsfwBtn() {
     btn.classList.remove('on');
     btn.innerHTML = `<span class="nsfw-icon">🔞</span><span class="nsfw-text">NSFW: OFF</span>`;
   }
+  $('#baddieHelp')?.classList.toggle('hidden', !state.ui.nsfw);
 }
 
 $('#nsfwToggle')?.addEventListener('click', () => {
@@ -303,6 +310,11 @@ $('#nsfwToggle')?.addEventListener('click', () => {
   renderAll();
 });
 
+$('#baddieHelpButton')?.addEventListener('click', () => {
+  playSound('sultry_whisper');
+  toast({ icon: '💅', title: 'BADDIE SUPPORT HAS BEEN NOTIFIED', body: 'Aunty is pretending to understand the issue. Please remain fabulous.', tone: 'good', ms: 3400 });
+});
+
 /* ---------- Sound FX Toggle ---------- */
 
 function updateSoundBtn() {
@@ -325,7 +337,7 @@ $('#soundToggle')?.addEventListener('click', () => {
   if (!next) {
     playSound('punch');
     setAfterDarkAmbience(state.ui.nsfw);
-    toast({ icon: '🔊', title: 'SOUND FX ENABLED', body: 'Punches, slaps, and after-dark bass are live.', tone: 'good', ms: 2500 });
+    toast({ icon: '🔊', title: 'SOUND + CHARACTER VOICES ENABLED', body: 'Tap a character for commentary; fights now come with verbal damage too.', tone: 'good', ms: 2800 });
   } else {
     setAfterDarkAmbience(false);
     toast({ icon: '🔇', title: 'SOUND FX MUTED', body: 'Surveillance audio silenced.', ms: 2500 });
@@ -525,11 +537,6 @@ window.addEventListener('resize', invalidate);
 /* ---------- briefing ---------- */
 
 function openBriefing() {
-  const ranked = [...state.territories].sort((a, b) => vibeScore(b) - vibeScore(a));
-  $('#briefingList').innerHTML = ranked
-    .slice(0, 3)
-    .map((t) => `<li><b>${t.name.toUpperCase()}</b><span style="color:${bandFor(vibeScore(t)).color}">${vibeScore(t)} · ${bandFor(vibeScore(t)).label}</span></li>`)
-    .join('');
   $('#briefingDialog').showModal();
 }
 

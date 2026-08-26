@@ -165,7 +165,7 @@ export const TAUNTS = [
 ];
 
 // Real-ish NCR coordinates. Stats are opening positions; user reports move them.
-export const TERRITORIES = [
+const NCR_TERRITORY_ROWS = [
   ['sector29', 'Sector 29', 'GURGAON', 28.4682, 77.0693, { chaos: 92, aura: 78, baddie: 71, reels: 88, fashion: 66, gym: 61, traffic: 84, npc: 22 }],
   ['cyberhub', 'Cyber Hub', 'GURGAON', 28.4951, 77.089, { chaos: 64, aura: 93, baddie: 90, reels: 81, fashion: 92, gym: 74, traffic: 70, npc: 34 }],
   ['mgroad', 'MG Road', 'GURGAON', 28.4796, 77.0812, { chaos: 78, aura: 62, baddie: 58, reels: 66, fashion: 54, gym: 66, traffic: 91, npc: 48 }],
@@ -188,7 +188,61 @@ export const TERRITORIES = [
   ['indirapuram', 'Indirapuram', 'GHAZIABAD', 28.6435, 77.3705, { chaos: 73, aura: 44, baddie: 39, reels: 56, fashion: 37, gym: 77, traffic: 81, npc: 68 }],
   ['parichowk', 'Pari Chowk', 'GR. NOIDA', 28.4595, 77.503, { chaos: 61, aura: 57, baddie: 48, reels: 68, fashion: 43, gym: 66, traffic: 47, npc: 71 }],
   ['faridabad', 'Faridabad Sec 15', 'FARIDABAD', 28.39, 77.31, { chaos: 79, aura: 49, baddie: 42, reels: 63, fashion: 41, gym: 81, traffic: 76, npc: 58 }],
-].map(([id, name, zone, lat, lng, stats]) => ({
+];
+
+// One starter pin in every state: enough to make a first visit useful, not enough to
+// pretend we have an auntie stationed on every street corner.
+export const NATIONAL_STARTER_ROWS = [
+  ['andhra-pradesh', 'Vijayawada Centre', 'ANDHRA PRADESH', 16.5062, 80.648, 'Tea stall debate reached IPL-commentary volume.'],
+  ['arunachal-pradesh', 'Itanagar Market', 'ARUNACHAL PRADESH', 27.0844, 93.6053, 'The mountain view had aura. The parking had other plans.'],
+  ['assam', 'Guwahati Riverfront', 'ASSAM', 26.1445, 91.7362, 'Scooter soundtrack arrived before the scooter.'],
+  ['bihar', 'Patna Boring Road', 'BIHAR', 25.6093, 85.1376, 'One chai, four opinions and a traffic solo.'],
+  ['chhattisgarh', 'Raipur Marine Drive', 'CHHATTISGARH', 21.2514, 81.6296, 'Evening stroll converted into a low-budget music video.'],
+  ['goa', 'Panjim Waterfront', 'GOA', 15.4909, 73.8278, 'Sunglasses were working overtime after sunset.'],
+  ['gujarat', 'Ahmedabad Riverfront', 'GUJARAT', 23.0225, 72.5714, 'The fit check had a louder entrance than the auto.'],
+  ['haryana', 'Chandigarh Sector 17', 'HARYANA', 30.7415, 76.7821, 'Perfectly planned city. Completely unplanned parking.'],
+  ['himachal-pradesh', 'Shimla Mall Road', 'HIMACHAL PRADESH', 31.1048, 77.1734, 'A reel shoot tried to outdo the actual hills.'],
+  ['jharkhand', 'Ranchi Main Road', 'JHARKHAND', 23.3441, 85.3096, 'Horn diplomacy is thriving.'],
+  ['karnataka', 'Bengaluru Indiranagar', 'KARNATAKA', 12.9784, 77.6408, 'Brunch queue formed a startup, raised funding, pivoted.'],
+  ['kerala', 'Kochi Fort Area', 'KERALA', 9.9312, 76.2673, 'Waterfront walk, impeccable fits, suspiciously cinematic lighting.'],
+  ['madhya-pradesh', 'Bhopal New Market', 'MADHYA PRADESH', 23.2599, 77.4126, 'Two-wheeler choreography needs its own national award.'],
+  ['maharashtra', 'Mumbai Bandra', 'MAHARASHTRA', 19.0596, 72.8295, 'A café queue is auditioning for a fashion week.'],
+  ['manipur', 'Imphal City Centre', 'MANIPUR', 24.817, 93.9368, 'Main-character energy detected near the evening crowd.'],
+  ['meghalaya', 'Shillong Police Bazar', 'MEGHALAYA', 25.5788, 91.8933, 'Rain, jackets and enough aura to power a district.'],
+  ['mizoram', 'Aizawl Centre', 'MIZORAM', 23.7271, 92.7176, 'The hill traffic is calm. The playlist is not.'],
+  ['nagaland', 'Kohima Town', 'NAGALAND', 25.6751, 94.1086, 'Street style levels require a calibration update.'],
+  ['odisha', 'Bhubaneswar Master Canteen', 'ODISHA', 20.2961, 85.8245, 'One friend said “quick stop.” Everyone knew better.'],
+  ['punjab', 'Ludhiana Clock Tower', 'PUNJAB', 30.901, 75.8573, 'Bass setting: civic emergency.'],
+  ['rajasthan', 'Jaipur MI Road', 'RAJASTHAN', 26.9124, 75.7873, 'Pink city, loud fits, absolutely zero indoor voices.'],
+  ['sikkim', 'Gangtok MG Marg', 'SIKKIM', 27.3389, 88.6065, 'The promenade is peaceful. The poses are not.'],
+  ['tamil-nadu', 'Chennai T Nagar', 'TAMIL NADU', 13.0827, 80.2707, 'Shopping bags gained sentience and took over the footpath.'],
+  ['telangana', 'Hyderabad Jubilee Hills', 'TELANGANA', 17.4319, 78.4071, 'Valet queue developing its own cinematic universe.'],
+  ['tripura', 'Agartala Ujjayanta', 'TRIPURA', 23.8315, 91.2868, 'Soft launch of a group hang became a full production.'],
+  ['uttar-pradesh', 'Lucknow Hazratganj', 'UTTAR PRADESH', 26.8467, 80.9462, 'The stroll is polite. The scooter exhaust is not.'],
+  ['uttarakhand', 'Dehradun Rajpur Road', 'UTTARAKHAND', 30.3256, 78.0437, 'Café hopping has exceeded the recommended dosage.'],
+  ['west-bengal', 'Kolkata Park Street', 'WEST BENGAL', 22.5535, 88.352, 'The fit is serving. The taxi horn is reviewing it.'],
+  ['andaman-nicobar', 'Port Blair Aberdeen Bazaar', 'ANDAMAN & NICOBAR ISLANDS', 11.6234, 92.7265, 'Island time is relaxed. The mirror checks are punctual.'],
+  ['chandigarh-ut', 'Chandigarh Sector 17', 'CHANDIGARH', 30.7415, 76.7821, 'The promenade is polished. The parking logic remains fictional.'],
+  ['dadra-nagar-haveli', 'Silvassa Town Square', 'DADRA & NAGAR HAVELI AND DAMAN & DIU', 20.273, 73.0083, 'A casual evening became a full outfit inspection.'],
+  ['delhi-ut', 'Delhi India Gate', 'NCT OF DELHI', 28.6129, 77.2295, 'A photoshoot formed before the snacks arrived.'],
+  ['jammu-kashmir', 'Srinagar Lal Chowk', 'JAMMU & KASHMIR', 34.0837, 74.7973, 'Winter jackets, excellent tea, maximum main-character energy.'],
+  ['ladakh', 'Leh Main Bazaar', 'LADAKH', 34.1526, 77.5771, 'The altitude is high. So is the confidence.'],
+  ['lakshadweep', 'Kavaratti Jetty', 'LAKSHADWEEP', 10.5669, 72.642, 'Sea breeze, immaculate fits, zero need for a ring light.'],
+  ['puducherry', 'Puducherry Promenade', 'PUDUCHERRY', 11.9416, 79.8083, 'The French quarter is serene. The scooter soundtrack says otherwise.'],
+];
+
+const starterStats = (index) => ({
+  chaos: 46 + (index * 7) % 42,
+  aura: 48 + (index * 11) % 43,
+  baddie: 38 + (index * 13) % 50,
+  reels: 42 + (index * 9) % 48,
+  fashion: 40 + (index * 5) % 51,
+  gym: 35 + (index * 8) % 48,
+  traffic: 44 + (index * 12) % 47,
+  npc: 28 + (index * 6) % 49,
+});
+
+export const TERRITORIES = [...NCR_TERRITORY_ROWS, ...NATIONAL_STARTER_ROWS.map(([id, name, zone, lat, lng], index) => [id, name, zone, lat, lng, starterStats(index)])].map(([id, name, zone, lat, lng, stats]) => ({
   id,
   name,
   zone,

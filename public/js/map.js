@@ -1,7 +1,7 @@
 // Leaflet surface: blurred heat blobs, animated characters, incident sticker clusters,
 // GPS radar tracker, search navigation, and dynamic multi-round combat engine.
 import { CATEGORIES, CHARACTERS, LANDMARKS } from './data.js';
-import { buildFightHtml, runCombatSequence } from './combat.js';
+import { buildFightHtml, runCombatSequence, speakCharacterLine } from './combat.js';
 import { activeLayers, activeSightings, bandFor, characterFor, characterForLayer, distanceKm, heatRadiusMeters, nearestTerritory, qualifiesForLayer, sightingStatCounts, state, territoryById, vibeScore } from './state.js';
 
 let map;
@@ -204,6 +204,7 @@ function drawCharacters() {
       marker.on('click', (e) => {
         L.DomEvent.stopPropagation(e);
         if (picking) return placePin([...t.coords]);
+        speakCharacterLine(resolveCharacterKey(t));
         handlers.onTerritoryClick?.(t.id);
       });
       marker.addTo(charLayer);

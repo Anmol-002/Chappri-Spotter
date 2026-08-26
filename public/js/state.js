@@ -1,7 +1,7 @@
 // Single source of truth. Everything on screen is derived from here, so a report
 // immediately and visibly changes scores, bands, characters and rankings.
 import { ACHIEVEMENTS, BANDS, CATEGORIES, CHARACTER_FOR_STAT, EXTRA_LINKS, LEVELS, NSFW_LAYERS, SFW_CATEGORIES, SFW_LAYERS, STATS } from './data.js';
-import { applySharedEvent, sanitizeSighting, seedWorld } from './world.js';
+import { applySharedEvent, mergeStarterWorld, sanitizeSighting, seedWorld } from './world.js';
 
 const KEY = 'chappri-spotter-v4';
 const NEIGHBOUR_RADIUS_KM = 11;
@@ -68,8 +68,9 @@ export function load() {
       if (s.mine && !state.agent.postedIds.includes(s.id)) state.agent.postedIds.push(s.id);
     });
   }
-  state.territories = saved?.territories?.length ? saved.territories : fresh.territories;
-  state.sightings = decorateSightings(saved?.sightings?.length ? saved.sightings : fresh.sightings);
+  const currentWorld = saved?.territories?.length ? mergeStarterWorld(saved) : fresh;
+  state.territories = currentWorld.territories;
+  state.sightings = decorateSightings(currentWorld.sightings);
   if (!saved?.sightings?.length) {
     state.territories.forEach((t) => {
       t.reports = state.sightings.filter((s) => s.territoryId === t.id).length;
@@ -96,8 +97,9 @@ export function reloadData() {
     return;
   }
   if (!saved) return;
-  if (saved.territories?.length) state.territories = saved.territories;
-  if (saved.sightings?.length) state.sightings = saved.sightings;
+  const currentWorld = mergeStarterWorld(saved);
+  state.territories = currentWorld.territories;
+  state.sightings = decorateSightings(currentWorld.sightings);
   state.battles = saved.battles || state.battles;
 }
 
@@ -129,9 +131,10 @@ export function resetAll() {
 
 export function applyRemoteWorld(world) {
   if (!world?.territories?.length) return;
-  state.territories = world.territories;
-  state.sightings = decorateSightings(world.sightings);
-  state.battles = world.battles || [];
+  const currentWorld = mergeStarterWorld(world);
+  state.territories = currentWorld.territories;
+  state.sightings = decorateSightings(currentWorld.sightings);
+  state.battles = currentWorld.battles;
   emit({ type: 'hydrate' });
 }
 

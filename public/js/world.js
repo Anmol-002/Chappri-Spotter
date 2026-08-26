@@ -1,6 +1,6 @@
 // Shared city world: the map, posts and fights everyone should see.
 // Personal XP / votes stay in the browser (see state.js).
-import { CATEGORIES, STATS, TERRITORIES } from './data.js';
+import { CATEGORIES, NATIONAL_STARTER_ROWS, STATS, TERRITORIES } from './data.js';
 
 export const MAX_SIGHTINGS = 400;
 export const MAX_BATTLES = 25;
@@ -53,6 +53,14 @@ const SEED_ROWS = [
   ['khanmarket', 'midnight-confession', 3, 'Wine tasting where the tasting notes were about whose divorce paid for it.', 22, true],
   ['golfcourse', 'looking-now', 3, 'Cold-coffee queue. Lat spread. Also looking. Denies both.', 19, true],
   ['saket', 'pool-party', 4, 'Terrace afterparty. Swimwear vs NCR morals. Swimwear is winning.', 31, true],
+  ...NATIONAL_STARTER_ROWS.map(([territoryId, , , , , note], index) => [
+    territoryId,
+    ['chapri', 'aura', 'reel', 'fashion'][index % 4],
+    3 + (index % 3),
+    note,
+    8 + (index * 7) % 29,
+    false,
+  ]),
 ];
 
 export function seedSightings() {
@@ -87,6 +95,26 @@ export function seedWorld() {
     battles: [],
     voters: {},
   };
+}
+
+/** Upgrade an older saved world with any starter places added in a newer release. */
+export function mergeStarterWorld(existing) {
+  const fresh = seedWorld();
+  if (!existing?.territories?.length) return fresh;
+  const territoryIds = new Set(existing.territories.map((t) => t.id));
+  const sightingIds = new Set((existing.sightings || []).map((s) => s.id));
+  const territories = [
+    ...existing.territories,
+    ...fresh.territories.filter((t) => !territoryIds.has(t.id)),
+  ];
+  const sightings = [
+    ...(existing.sightings || []),
+    ...fresh.sightings.filter((s) => !sightingIds.has(s.id)),
+  ];
+  territories.forEach((t) => {
+    if (!territoryIds.has(t.id)) t.reports = sightings.filter((s) => s.territoryId === t.id).length;
+  });
+  return { ...existing, territories, sightings, battles: existing.battles || [], voters: existing.voters || {} };
 }
 
 export function sanitizeSighting(s) {

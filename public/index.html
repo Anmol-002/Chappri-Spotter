@@ -27,7 +27,7 @@
         <div class="search-results hidden" id="searchResults"></div>
       </div>
 
-      <div class="ticker" id="ticker"><i></i><span id="tickerText">NCR VIBE INTELLIGENCE NETWORK — ONLINE</span></div>
+      <div class="ticker" id="ticker"><i></i><span id="tickerText">INDIA VIBE INTELLIGENCE NETWORK — ONLINE</span></div>
 
       <div class="header-actions">
         <!-- 18+ NSFW Mode Toggle -->
@@ -48,7 +48,7 @@
     <main>
       <aside class="sidebar" id="liveSidebar">
         <button class="sidebar-close" id="feedClose" type="button" aria-label="Close live feed">×</button>
-        <div class="sidebar-title"><i></i> LIVE NCR FEED</div>
+        <div class="sidebar-title"><i></i> LIVE INDIA FEED</div>
 
         <section class="agent-card" id="agentCard"></section>
 
@@ -62,16 +62,24 @@
           <span>ALL FIELD DATA IS SATIRICAL.</span>
           <button class="reset-link" id="resetCity">RESET MY AGENT</button>
         </div>
+        <section class="baddie-help hidden" id="baddieHelp" aria-label="After Dark help">
+          <div class="baddie-help-kicker">🔞 MILF SUPPORT DESK</div>
+          <strong>Help? Only for baddies.</strong>
+          <p>You thought we were helping the boys? Cute. Baddies, tap in for satisfaction—sorry, <em>site issues</em>.</p>
+          <button type="button" id="baddieHelpButton">SUMMON THE SUPPORT AUNTY →</button>
+        </section>
       </aside>
 
       <section class="stage" id="mapView">
         <div id="map"></div>
 
-        <div class="map-title"><span class="pulse"></span> GEOSPATIAL VIBE ANALYSIS <small>DELHI NCR</small></div>
+        <div class="map-title"><span class="pulse"></span> GEOSPATIAL VIBE ANALYSIS <small>INDIA</small></div>
 
         <div class="map-controls">
           <label class="control filter-control">SHOW ME<select id="layerSelect"></select></label>
-          <button class="control" id="locateButton" title="Locate me">◎ <span class="locate-full">LOCATE ME</span><span class="locate-short">GPS</span></button>
+          <button class="control locate-control" id="locateButton" title="Go to my current location" aria-label="Go to my current location">
+            <span class="locate-icon" aria-hidden="true">📍</span><span class="locate-full">MY LOCATION</span><span class="locate-short">LOCATE</span>
+          </button>
         </div>
         <div class="gps-live-pill hidden" id="gpsLive"></div>
 
@@ -122,12 +130,18 @@
     <!-- Briefing Dialog -->
     <dialog id="briefingDialog">
       <div class="briefing">
-        <div class="eyebrow">AUNTY INTELLIGENCE NETWORK · DAILY BRIEFING</div>
+        <div class="eyebrow">AUNTY INTELLIGENCE NETWORK · QUICK START</div>
         <h1>CHAPPRI SPOTTER<sup>™</sup></h1>
-        <p class="lead">We have analyzed the city.<br /><strong>The results are concerning.</strong></p>
-        <ul id="briefingList"></ul>
-        <p class="fineprint">One map. Tap an area to read posts. Pick a filter to see only that species. Start a fight and watch it happen live.</p>
-        <button class="submit" id="briefingStart">ENTER THE MAP →</button>
+        <p class="lead">A public-service map for avoiding questionable plans.<br /><strong>We have analyzed the vibes. The results are concerning.</strong></p>
+        <ul class="quick-guide">
+          <li><span>🚨</span><p><b>Spot the nonsense.</b> Check an area before you commit to a café, market, or “just one drink.” If the chappri count is alarming, preserve your peace.</p></li>
+          <li><span>🥊</span><p><b>Pick harmless map beef.</b> Tap an area, inspect the live posts, and start a cartoon fight with nearby characters. No real people; only location-level satire.</p></li>
+          <li><span>📡</span><p><b>Find your own chaos.</b> Use the top-right GPS button to return to your location, or search any city. The map comes with a few starter sightings so nobody arrives at an empty party.</p></li>
+          <li><span>🗣️</span><p><b>Read the live feed.</b> See what the field correspondents (and one suspicious balcony uncle) have posted in real time.</p></li>
+        </ul>
+        <p class="fineprint">What makes this special: dramatic location intelligence, community posts, cartoon battles, and zero pretending this is serious.</p>
+        <p class="briefing-risk">🔞 After Dark exists in the top right. Open NSFW at your own risk, lol.</p>
+        <button class="submit" id="briefingStart">I ACCEPT THE VIBES →</button>
       </div>
     </dialog>
 

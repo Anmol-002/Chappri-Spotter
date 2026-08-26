@@ -1,6 +1,7 @@
 // Dynamic combat engine: Procedural Web Audio FX + multi-stage punch & hair-pulling battle choreography
 import { CHARACTERS } from './data.js';
 import { state } from './state.js';
+import { VOICE_LINES } from './voice-lines.js';
 
 /* ---------- Procedural Web Audio Synthesizer ---------- */
 let audioCtx = null;
@@ -306,6 +307,55 @@ export function playSound(type) {
     }
   } catch {
     // Audio context initialization blocked or unsupported; silent fallback
+  }
+}
+
+function installedHindiVoice() {
+  try {
+    return window.speechSynthesis.getVoices().find((voice) => /^hi(?:-|_)/i.test(voice.lang));
+  } catch {
+    return null;
+  }
+}
+
+let currentVoiceAudio = null;
+
+function clipCount(charKey, fight) {
+  const lines = VOICE_LINES[fight ? 'fight' : 'map']?.[charKey];
+  return Math.max(1, lines?.length || 1);
+}
+
+function voiceSrc(charKey, fight, variant) {
+  const mode = fight ? 'fight' : 'map';
+  return `/voice/${encodeURIComponent(charKey)}-${mode}-${variant}.mp3`;
+}
+
+export function speakCharacterLine(charKey, { fight = false } = {}) {
+  if (state.ui.soundMuted || typeof window === 'undefined') return;
+  currentVoiceAudio?.pause();
+  const variant = Math.floor(Math.random() * clipCount(charKey, fight));
+  const audio = new Audio(voiceSrc(charKey, fight, variant));
+  audio.volume = fight ? 0.92 : 0.72;
+  currentVoiceAudio = audio;
+  audio.play().catch(() => speakDeviceFallback(charKey, fight));
+}
+
+function speakDeviceFallback(charKey, fight) {
+  if (!('speechSynthesis' in window)) return;
+  const lines = VOICE_LINES[fight ? 'fight' : 'map']?.[charKey] || [];
+  const text = lines[0] || (fight ? 'धिशूम! अब बोल!' : 'वाइब स्कैन कंप्लीट, भाई।');
+  const utterance = new SpeechSynthesisUtterance(text);
+  const hindiVoice = installedHindiVoice();
+  utterance.lang = hindiVoice?.lang || 'hi-IN';
+  if (hindiVoice) utterance.voice = hindiVoice;
+  utterance.rate = fight ? 1.18 : 1.05;
+  utterance.pitch = charKey === 'baddie' ? 1.12 : charKey === 'uncle' ? 0.86 : 1;
+  utterance.volume = fight ? 0.92 : 0.72;
+  try {
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+  } catch {
+    /* Safari and privacy modes may block speech; procedural SFX still play. */
   }
 }
 
@@ -792,6 +842,7 @@ export function runCombatSequence(container, fight, a, b, aChar, bChar, winner, 
     bubbleA?.classList.add('show-bubble');
     bubbleB?.classList.add('show-bubble');
     playSound('whoosh');
+    speakCharacterLine(aChar, { fight: true });
   }, 160);
 
   later(() => {
@@ -804,6 +855,7 @@ export function runCombatSequence(container, fight, a, b, aChar, bChar, winner, 
   later(() => {
     triggerHit('B', 'punch', 'FATAK!');
     updateHp('A', 12);
+    speakCharacterLine(bChar, { fight: true });
   }, 1100);
 
   later(() => {
@@ -827,6 +879,7 @@ export function runCombatSequence(container, fight, a, b, aChar, bChar, winner, 
         bubbleA.textContent = getShout(aChar, false);
         bubbleA.classList.add('show-bubble');
       }
+      speakCharacterLine(aChar, { fight: true });
     } else if (aChar === 'chapri' || bChar === 'chapri') {
       triggerHit('A', 'punch', '🩴 CHAPPAL TOSS!');
       updateHp('B', 20);

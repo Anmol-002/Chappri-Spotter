@@ -468,6 +468,20 @@ main { height: calc(100dvh - 64px); flex: 1; min-height: 0; display: flex; }
 }
 .control select option { background: #0f1615; }
 .filter-control { border-color: #506224; box-shadow: 0 0 24px #d3ff3610; }
+.locate-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-color: var(--lime);
+  background: #15220d;
+  color: #e7ff9c;
+  box-shadow: 0 0 0 1px #d3ff3644, 0 0 18px #d3ff3650;
+  font-weight: 700;
+  animation: locateGlow 1.8s ease-in-out infinite;
+}
+.locate-control:hover { background: var(--lime); color: #08120e; }
+.locate-icon { display: grid; place-items: center; width: 19px; height: 19px; font-size: 15px; filter: drop-shadow(0 0 5px #d3ff36); }
+@keyframes locateGlow { 50% { box-shadow: 0 0 0 3px #d3ff3622, 0 0 25px #d3ff3690; } }
 
 .map-legend {
   position: absolute;
@@ -1792,6 +1806,20 @@ textarea {
 .briefing ul { list-style: none; padding: 0; margin: 0 0 18px; text-align: left; }
 .briefing li { display: flex; justify-content: space-between; border-bottom: 1px solid #172120; padding: 9px 2px; font-size: 12.5px; }
 .briefing li span { font: 10px var(--mono); }
+.briefing .quick-guide { display: grid; gap: 7px; }
+.briefing .quick-guide li { display: flex; align-items: flex-start; justify-content: flex-start; gap: 9px; padding: 9px 4px; }
+.quick-guide li > span { font-size: 17px; line-height: 1.3; }
+.quick-guide p { margin: 0; color: #b9c5c1; font-size: 12px; line-height: 1.45; }
+.quick-guide b { color: var(--ink); }
+.briefing-risk { margin: 0 0 14px; color: #ff8ad0; font: 11px var(--mono); }
+
+.baddie-help { margin-top: auto; border: 1px solid #6d2451; background: linear-gradient(135deg, #271023, #120e15); padding: 11px; }
+.baddie-help-kicker { color: #ff8ad0; font: 8px var(--mono); letter-spacing: 1px; margin-bottom: 5px; }
+.baddie-help strong { display: block; color: #fff0f8; font-size: 12px; }
+.baddie-help p { margin: 5px 0 9px; color: #d4a9c5; font-size: 10px; line-height: 1.45; }
+.baddie-help em { color: #ff8ad0; }
+.baddie-help button { width: 100%; border: 1px solid #b82d7c; background: #41142f; color: #ffd7eb; min-height: 34px; font: 700 9px var(--mono); cursor: pointer; }
+.baddie-help button:hover { background: #682044; }
 
 #shareCanvas { width: 100%; height: auto; border: 1px solid var(--line); margin: 12px 0; display: block; }
 .share-actions { display: flex; flex-direction: column; gap: 7px; }
@@ -1962,6 +1990,8 @@ textarea {
   .filter-control { flex: 1; min-width: 0; }
   .filter-control select { width: 100%; max-width: 100%; }
   #locateButton { flex: none; white-space: nowrap; min-height: 40px; }
+  .locate-control { padding: 8px 10px; gap: 4px; }
+  .locate-icon { width: 17px; height: 17px; font-size: 14px; }
   .gps-live-pill {
     top: 58px;
     right: 8px;
@@ -2045,6 +2075,11 @@ textarea {
   dialog h2 { font-size: 20px; }
   .briefing h1 { font-size: 26px; }
   .briefing .lead { font-size: 14px; }
+  .briefing .quick-guide { gap: 3px; margin-bottom: 10px; }
+  .briefing .quick-guide li { padding: 6px 2px; gap: 7px; }
+  .quick-guide li > span { font-size: 15px; }
+  .quick-guide p { font-size: 10.5px; line-height: 1.35; }
+  .briefing-risk { font-size: 9px; margin-bottom: 10px; }
   .result-score { grid-template-columns: 1fr; }
   .chips .chip { padding: 8px 9px; }
   .pick-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); max-height: 40dvh; }
