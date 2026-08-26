@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Chappri Spotter™ — We have analyzed the city. The results are concerning.</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="vendor/leaflet.css" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="scanlines" aria-hidden="true"></div>
+
+    <header>
+      <a class="brand" href="#"><span class="brand-mark">CS</span><span>CHAPPRI<br />SPOTTER<sup>™</sup></span></a>
+
+      <!-- Location Search Bar -->
+      <div class="search-container" id="searchContainer">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="locationSearch" placeholder="Search Bangalore, Cyber Hub…" autocomplete="off" />
+          <button class="search-clear hidden" id="searchClear" aria-label="Clear search">×</button>
+        </div>
+        <div class="search-results hidden" id="searchResults"></div>
+      </div>
+
+      <div class="ticker" id="ticker"><i></i><span id="tickerText">NCR VIBE INTELLIGENCE NETWORK — ONLINE</span></div>
+
+      <div class="header-actions">
+        <!-- 18+ NSFW Mode Toggle -->
+        <button class="nsfw-toggle" id="nsfwToggle" title="Toggle 18+ Uncensored / After Dark Mode">
+          <span class="nsfw-icon">🔞</span><span class="nsfw-text">NSFW: OFF</span>
+        </button>
+
+        <!-- Sound FX Toggle -->
+        <button class="sound-toggle" id="soundToggle" title="Toggle Street Sounds">
+          <span id="soundIcon">🔊</span>
+        </button>
+
+        <div class="live-pill"><i></i><span id="liveCount">22 AREAS LIVE</span></div>
+        <button class="report-button" id="reportButton"><span class="report-full">+ REPORT SIGHTING</span><span class="report-short">+ REPORT</span></button>
+      </div>
+    </header>
+
+    <main>
+      <aside class="sidebar" id="liveSidebar">
+        <button class="sidebar-close" id="feedClose" type="button" aria-label="Close live feed">×</button>
+        <div class="sidebar-title"><i></i> LIVE NCR FEED</div>
+
+        <section class="agent-card" id="agentCard"></section>
+
+        <section class="feed">
+          <div class="section-title">WHAT PEOPLE POSTED <span>●</span></div>
+          <div id="feed"></div>
+        </section>
+
+        <div class="privacy-note">
+          NO PEOPLE. NO PII. LOCATIONS ONLY.<br />
+          <span>ALL FIELD DATA IS SATIRICAL.</span>
+          <button class="reset-link" id="resetCity">RESET MY AGENT</button>
+        </div>
+      </aside>
+
+      <section class="stage" id="mapView">
+        <div id="map"></div>
+
+        <div class="map-title"><span class="pulse"></span> GEOSPATIAL VIBE ANALYSIS <small>DELHI NCR</small></div>
+
+        <div class="map-controls">
+          <label class="control filter-control">SHOW ME<select id="layerSelect"></select></label>
+          <button class="control" id="locateButton" title="Locate me">◎ <span class="locate-full">LOCATE ME</span><span class="locate-short">GPS</span></button>
+        </div>
+        <div class="gps-live-pill hidden" id="gpsLive"></div>
+
+        <div class="map-legend" id="mapLegend"></div>
+
+        <div class="pin-banner hidden" id="pinBanner">
+          <b>📍 TAP THE MAP WHERE THE CHAOS IS</b>
+          <span>Drag the pin to fine-tune. Report the location's vibe, never a person.</span>
+          <button id="pinCancel">CANCEL</button>
+        </div>
+
+        <aside class="dossier hidden" id="dossier"></aside>
+        <div class="live-fight-note hidden" id="liveFightNote"></div>
+
+        <button class="feed-dock" id="feedToggle" type="button" aria-expanded="false">
+          <i></i><b>LIVE</b><em id="feedDockCount">0</em>
+        </button>
+        <div class="feed-scrim" id="feedScrim"></div>
+
+        <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <!-- Report Incident Dialog -->
+    <dialog id="reportDialog" class="wide">
+      <button class="dialog-close" data-close>×</button>
+      <div id="reportBody"></div>
+    </dialog>
+
+    <!-- Battle Challenger Dialog -->
+    <dialog id="battleDialog" class="wide">
+      <button class="dialog-close" data-close>×</button>
+      <div id="battleBody"></div>
+    </dialog>
+
+    <!-- Area Posts Cluster Dialog -->
+    <dialog id="areaPostsDialog" class="wide">
+      <button class="dialog-close" data-close>×</button>
+      <div id="areaPostsBody"></div>
+    </dialog>
+
+    <!-- Gen-Z Makeout Roulette / Matchmaker Dialog -->
+    <dialog id="matchmakerDialog">
+      <button class="dialog-close" data-close>×</button>
+      <div id="matchmakerBody"></div>
+    </dialog>
+
+    <!-- Briefing Dialog -->
+    <dialog id="briefingDialog">
+      <div class="briefing">
+        <div class="eyebrow">AUNTY INTELLIGENCE NETWORK · DAILY BRIEFING</div>
+        <h1>CHAPPRI SPOTTER<sup>™</sup></h1>
+        <p class="lead">We have analyzed the city.<br /><strong>The results are concerning.</strong></p>
+        <ul id="briefingList"></ul>
+        <p class="fineprint">One map. Tap an area to read posts. Pick a filter to see only that species. Start a fight and watch it happen live.</p>
+        <button class="submit" id="briefingStart">ENTER THE MAP →</button>
+      </div>
+    </dialog>
+
+    <!-- Social Share Dialog -->
+    <dialog id="shareDialog">
+      <button class="dialog-close" data-close>×</button>
+      <div class="eyebrow">DECLASSIFIED FOR SOCIAL MEDIA</div>
+      <canvas id="shareCanvas" width="900" height="1125"></canvas>
+      <div class="share-actions">
+        <button class="submit" id="shareDownload">DOWNLOAD CARD</button>
+        <button class="ghost-wide" id="shareCopy">COPY THE TEXT</button>
+      </div>
+    </dialog>
+
+    <script src="vendor/leaflet.js"></script>
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>

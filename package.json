@@ -1,0 +1,20 @@
+{
+  "name": "chappri-spotter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A satirical, location-first vibe intelligence MVP.",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "smoke": "node tools/smoke-v3.mjs"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^25.9.0"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4"
+  }
+}

@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <path fill="#d3ff36" d="M8 0h56v52L52 64H0V8z" />
+  <text x="32" y="43" font-family="monospace" font-size="30" font-weight="700" text-anchor="middle" fill="#07100d">CS</text>
+</svg>

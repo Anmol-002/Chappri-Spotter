@@ -1,0 +1,4 @@
+node_modules/
+data/world.json
+.DS_Store
+.env
