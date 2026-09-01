@@ -190,6 +190,35 @@ const NCR_TERRITORY_ROWS = [
   ['faridabad', 'Faridabad Sec 15', 'FARIDABAD', 28.39, 77.31, { chaos: 79, aura: 49, baddie: 42, reels: 63, fashion: 41, gym: 81, traffic: 76, npc: 58 }],
 ];
 
+// Dense starter maps for the three cities most people will actually open the app in.
+const METRO_TERRITORY_ROWS = [
+  ['blr-indiranagar', 'Indiranagar 100ft', 'BENGALURU', 12.9784, 77.6408, { chaos: 86, aura: 88, baddie: 84, reels: 91, fashion: 82, gym: 64, traffic: 79, npc: 28 }],
+  ['blr-koramangala', 'Koramangala 80ft', 'BENGALURU', 12.9352, 77.6245, { chaos: 81, aura: 79, baddie: 77, reels: 88, fashion: 74, gym: 61, traffic: 83, npc: 33 }],
+  ['blr-whitefield', 'Whitefield ITPL', 'BENGALURU', 12.9698, 77.7499, { chaos: 54, aura: 41, baddie: 39, reels: 58, fashion: 36, gym: 72, traffic: 94, npc: 88 }],
+  ['blr-mgroad', 'Bengaluru MG Road', 'BENGALURU', 12.9758, 77.6096, { chaos: 74, aura: 71, baddie: 68, reels: 76, fashion: 73, gym: 48, traffic: 88, npc: 46 }],
+  ['blr-hsr', 'HSR Layout', 'BENGALURU', 12.9121, 77.6446, { chaos: 63, aura: 72, baddie: 70, reels: 69, fashion: 71, gym: 78, traffic: 71, npc: 41 }],
+  ['blr-church', 'Church Street', 'BENGALURU', 12.9756, 77.605, { chaos: 78, aura: 83, baddie: 80, reels: 85, fashion: 79, gym: 44, traffic: 62, npc: 29 }],
+  ['blr-ecity', 'Electronic City', 'BENGALURU', 12.8399, 77.677, { chaos: 48, aura: 34, baddie: 31, reels: 44, fashion: 29, gym: 67, traffic: 91, npc: 93 }],
+  ['blr-marathahalli', 'Marathahalli', 'BENGALURU', 12.9592, 77.6974, { chaos: 72, aura: 46, baddie: 43, reels: 61, fashion: 40, gym: 69, traffic: 96, npc: 64 }],
+  ['blr-jayanagar', 'Jayanagar 4th Block', 'BENGALURU', 12.925, 77.5937, { chaos: 51, aura: 58, baddie: 54, reels: 57, fashion: 61, gym: 56, traffic: 68, npc: 52 }],
+  ['hyd-jubilee', 'Jubilee Hills Rd 36', 'HYDERABAD', 17.4319, 78.4071, { chaos: 71, aura: 92, baddie: 88, reels: 84, fashion: 91, gym: 63, traffic: 74, npc: 27 }],
+  ['hyd-banjara', 'Banjara Hills', 'HYDERABAD', 17.4148, 78.4398, { chaos: 64, aura: 87, baddie: 86, reels: 79, fashion: 90, gym: 58, traffic: 69, npc: 31 }],
+  ['hyd-hitec', 'HITEC City', 'HYDERABAD', 17.4474, 78.3762, { chaos: 58, aura: 62, baddie: 57, reels: 71, fashion: 54, gym: 76, traffic: 86, npc: 71 }],
+  ['hyd-gachibowli', 'Gachibowli', 'HYDERABAD', 17.4401, 78.3489, { chaos: 52, aura: 55, baddie: 51, reels: 63, fashion: 49, gym: 81, traffic: 82, npc: 77 }],
+  ['hyd-madhapur', 'Madhapur', 'HYDERABAD', 17.4483, 78.3915, { chaos: 67, aura: 73, baddie: 69, reels: 80, fashion: 66, gym: 70, traffic: 84, npc: 48 }],
+  ['hyd-charminar', 'Charminar', 'HYDERABAD', 17.3616, 78.4747, { chaos: 89, aura: 61, baddie: 48, reels: 72, fashion: 58, gym: 36, traffic: 93, npc: 59 }],
+  ['hyd-kondapur', 'Kondapur', 'HYDERABAD', 17.4943, 78.3996, { chaos: 61, aura: 58, baddie: 56, reels: 64, fashion: 53, gym: 74, traffic: 80, npc: 62 }],
+  ['hyd-secunderabad', 'Secunderabad', 'HYDERABAD', 17.4399, 78.4983, { chaos: 76, aura: 49, baddie: 44, reels: 58, fashion: 47, gym: 52, traffic: 88, npc: 66 }],
+  ['pune-kp', 'Koregaon Park', 'PUNE', 18.5362, 73.8939, { chaos: 74, aura: 86, baddie: 83, reels: 81, fashion: 84, gym: 67, traffic: 71, npc: 30 }],
+  ['pune-fc', 'FC Road', 'PUNE', 18.5284, 73.8417, { chaos: 83, aura: 72, baddie: 75, reels: 86, fashion: 69, gym: 54, traffic: 78, npc: 34 }],
+  ['pune-baner', 'Baner', 'PUNE', 18.559, 73.7868, { chaos: 62, aura: 68, baddie: 66, reels: 70, fashion: 64, gym: 79, traffic: 76, npc: 45 }],
+  ['pune-hinjewadi', 'Hinjewadi Phase 1', 'PUNE', 18.5913, 73.738, { chaos: 49, aura: 37, baddie: 34, reels: 51, fashion: 32, gym: 73, traffic: 95, npc: 91 }],
+  ['pune-viman', 'Viman Nagar', 'PUNE', 18.5679, 73.9143, { chaos: 68, aura: 64, baddie: 61, reels: 73, fashion: 59, gym: 62, traffic: 81, npc: 47 }],
+  ['pune-kothrud', 'Kothrud', 'PUNE', 18.5074, 73.8077, { chaos: 57, aura: 53, baddie: 49, reels: 55, fashion: 51, gym: 66, traffic: 73, npc: 58 }],
+  ['pune-camp', 'Pune Camp', 'PUNE', 18.5126, 73.8782, { chaos: 79, aura: 58, baddie: 54, reels: 66, fashion: 57, gym: 47, traffic: 85, npc: 51 }],
+  ['pune-kalyani', 'Kalyani Nagar', 'PUNE', 18.5463, 73.9018, { chaos: 66, aura: 77, baddie: 74, reels: 72, fashion: 76, gym: 63, traffic: 69, npc: 38 }],
+];
+
 // One starter pin in every state: enough to make a first visit useful, not enough to
 // pretend we have an auntie stationed on every street corner.
 export const NATIONAL_STARTER_ROWS = [
@@ -242,7 +271,7 @@ const starterStats = (index) => ({
   npc: 28 + (index * 6) % 49,
 });
 
-export const TERRITORIES = [...NCR_TERRITORY_ROWS, ...NATIONAL_STARTER_ROWS.map(([id, name, zone, lat, lng], index) => [id, name, zone, lat, lng, starterStats(index)])].map(([id, name, zone, lat, lng, stats]) => ({
+export const TERRITORIES = [...NCR_TERRITORY_ROWS, ...METRO_TERRITORY_ROWS, ...NATIONAL_STARTER_ROWS.map(([id, name, zone, lat, lng], index) => [id, name, zone, lat, lng, starterStats(index)])].map(([id, name, zone, lat, lng, stats]) => ({
   id,
   name,
   zone,
@@ -268,6 +297,16 @@ export const EXTRA_LINKS = [
   ['faridabad', 'sohna'],
   ['sohna', 'golfcourse'],
   ['indirapuram', 'laxminagar'],
+  ['blr-indiranagar', 'blr-koramangala'],
+  ['blr-koramangala', 'blr-hsr'],
+  ['blr-mgroad', 'blr-church'],
+  ['blr-whitefield', 'blr-marathahalli'],
+  ['hyd-jubilee', 'hyd-banjara'],
+  ['hyd-hitec', 'hyd-madhapur'],
+  ['hyd-gachibowli', 'hyd-kondapur'],
+  ['pune-kp', 'pune-kalyani'],
+  ['pune-fc', 'pune-camp'],
+  ['pune-baner', 'pune-hinjewadi'],
 ];
 
 /* ---------- Rich NCR Landmarks Database for Instant Search ---------- */
@@ -299,6 +338,31 @@ export const LANDMARKS = [
   { name: 'Pacific Mall Subhash Nagar', territoryId: 'rajouri', zone: 'Delhi', query: 'pacific mall subhash nagar tagore garden west delhi' },
   { name: 'Ambience Mall Gurgaon', territoryId: 'cyberhub', zone: 'Gurgaon', query: 'ambience mall gurgaon leela toll gate' },
   { name: 'Rohini Sector 7/8', territoryId: 'dwarka', zone: 'Delhi', query: 'rohini sec 7 sec 8 unity one rithala' },
+  { name: 'Indiranagar 100ft', territoryId: 'blr-indiranagar', zone: 'Bengaluru', query: 'indiranagar 100 feet 12th main blr bengaluru bangalore' },
+  { name: 'Koramangala 80ft', territoryId: 'blr-koramangala', zone: 'Bengaluru', query: 'koramangala 80 feet 5th block 6th block forum' },
+  { name: 'Whitefield / ITPL', territoryId: 'blr-whitefield', zone: 'Bengaluru', query: 'whitefield itpl phoenix marketcity hope farm' },
+  { name: 'MG Road Bengaluru', territoryId: 'blr-mgroad', zone: 'Bengaluru', query: 'mg road brigade road trinity metro cubbon' },
+  { name: 'HSR Layout', territoryId: 'blr-hsr', zone: 'Bengaluru', query: 'hsr layout sector 1 2 27th main agara' },
+  { name: 'Church Street', territoryId: 'blr-church', zone: 'Bengaluru', query: 'church street brigade plaza st marks' },
+  { name: 'Electronic City', territoryId: 'blr-ecity', zone: 'Bengaluru', query: 'electronic city e-city phase 1 silk board' },
+  { name: 'Marathahalli', territoryId: 'blr-marathahalli', zone: 'Bengaluru', query: 'marathahalli bridge outer ring road kalamandir' },
+  { name: 'Jayanagar 4th Block', territoryId: 'blr-jayanagar', zone: 'Bengaluru', query: 'jayanagar 4th block south end circle' },
+  { name: 'Jubilee Hills Road 36', territoryId: 'hyd-jubilee', zone: 'Hyderabad', query: 'jubilee hills road 36 film nagar peddamma' },
+  { name: 'Banjara Hills', territoryId: 'hyd-banjara', zone: 'Hyderabad', query: 'banjara hills road 1 12 gvk one' },
+  { name: 'HITEC City', territoryId: 'hyd-hitec', zone: 'Hyderabad', query: 'hitec city hitech cyber towers mindspace' },
+  { name: 'Gachibowli', territoryId: 'hyd-gachibowli', zone: 'Hyderabad', query: 'gachibowli financial district isb botanical garden' },
+  { name: 'Madhapur', territoryId: 'hyd-madhapur', zone: 'Hyderabad', query: 'madhapur inorbit ramky one' },
+  { name: 'Charminar', territoryId: 'hyd-charminar', zone: 'Hyderabad', query: 'charminar old city lad bazar pearla' },
+  { name: 'Kondapur', territoryId: 'hyd-kondapur', zone: 'Hyderabad', query: 'kondapur botanical garden kothaguda' },
+  { name: 'Secunderabad', territoryId: 'hyd-secunderabad', zone: 'Hyderabad', query: 'secunderabad clock tower paradise parade ground' },
+  { name: 'Koregaon Park', territoryId: 'pune-kp', zone: 'Pune', query: 'koregaon park kp lane 5 german bakery osho' },
+  { name: 'FC Road', territoryId: 'pune-fc', zone: 'Pune', query: 'fc road fergusson college jm road' },
+  { name: 'Baner', territoryId: 'pune-baner', zone: 'Pune', query: 'baner balewadi high street aundh' },
+  { name: 'Hinjewadi Phase 1', territoryId: 'pune-hinjewadi', zone: 'Pune', query: 'hinjewadi phase 1 2 rajiv gandhi it park' },
+  { name: 'Viman Nagar', territoryId: 'pune-viman', zone: 'Pune', query: 'viman nagar phoenix marketcity airport road' },
+  { name: 'Kothrud', territoryId: 'pune-kothrud', zone: 'Pune', query: 'kothrud paud road karve statue' },
+  { name: 'Pune Camp', territoryId: 'pune-camp', zone: 'Pune', query: 'pune camp mg road east street' },
+  { name: 'Kalyani Nagar', territoryId: 'pune-kalyani', zone: 'Pune', query: 'kalyani nagar mundhwa kalyani nagar' },
 ];
 
 /* ---------- Gen-Z Matchmaker Roulette Profiles ---------- */
@@ -360,5 +424,53 @@ export const ROASTS = {
   khanmarket: {
     sfw: 'Khan Market: A cup of coffee costs one organ, but at least you saw three retired diplomats and an indie filmmaker.',
     nsfw: 'Khan Market After Dark: Posh wine tastings where everyone is quietly checking whose divorce settlement was bigger.',
+  },
+  'blr-indiranagar': {
+    sfw: 'Indiranagar: Brunch queue incorporated as a startup, raised a seed round, then pivoted to waiting.',
+    nsfw: 'Indiranagar After Dark: 100ft Road pubs where “one drink” is a legally binding overnight contract.',
+  },
+  'blr-koramangala': {
+    sfw: 'Koramangala: Every third person is “building something in stealth.” The stealth is a Notion doc.',
+    nsfw: 'Koramangala After Dark: Terrace parties where the founder pitch and the situationship use the same slide deck.',
+  },
+  'blr-whitefield': {
+    sfw: 'Whitefield: You left home at 6. You will arrive in time for next quarter’s standup.',
+    nsfw: 'Whitefield After Dark: Cab cancelled itself. So did the date. Phoenix parking is still judging you.',
+  },
+  'blr-mgroad': {
+    sfw: 'MG Road: Brigade Road is a fashion week that forgot to invite the weather.',
+    nsfw: 'MG Road After Dark: Metro last-train energy mixed with “my PG warden thinks I am at the library.”',
+  },
+  'blr-church': {
+    sfw: 'Church Street: Live music, dead parking, and 14 people filming the same guitarist.',
+    nsfw: 'Church Street After Dark: Two pints in and everyone is suddenly a poet with a hotel booking.',
+  },
+  'blr-hsr': {
+    sfw: 'HSR: Filter coffee, dog parks, and a 27th Main that believes it is a highway.',
+    nsfw: 'HSR After Dark: Society parks after 11 where the walking trail is not for walking.',
+  },
+  'hyd-jubilee': {
+    sfw: 'Jubilee Hills: Valet tickets have a higher net worth than the hatchback they belong to.',
+    nsfw: 'Jubilee Hills After Dark: Road 36 tables where the biryani is spicy and the gossip is extra dum.',
+  },
+  'hyd-hitec': {
+    sfw: 'HITEC City: Badge lanyards as far as the eye can see. The eye is also on a standup call.',
+    nsfw: 'HITEC After Dark: “Client dinner” that mysteriously ends at a hotel with hourly rates.',
+  },
+  'hyd-charminar': {
+    sfw: 'Charminar: Pearls, irani chai, and traffic that has been in beta since 1591.',
+    nsfw: 'Charminar After Dark: Old City lanes where the sherwani shop uncle has seen every plot twist.',
+  },
+  'pune-kp': {
+    sfw: 'Koregaon Park: Osho leftover calm colliding with 2026 main-character volume.',
+    nsfw: 'KP After Dark: Lane 7 where the German Bakery is closed and the morals are optional.',
+  },
+  'pune-fc': {
+    sfw: 'FC Road: Students, scooters, and a Fergusson degree being used as a tripod stand.',
+    nsfw: 'FC Road After Dark: Hostel curfew vs juice-centre alibi. The juice centre has seen things.',
+  },
+  'pune-hinjewadi': {
+    sfw: 'Hinjewadi: An IT park so large your cab completed onboarding before it found Gate 3.',
+    nsfw: 'Hinjewadi After Dark: Phase 1 parking where WFH ended and “wfh nearby” began.',
   },
 };

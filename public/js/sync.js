@@ -51,23 +51,59 @@ export async function pushSharedEvent(event) {
 }
 
 export function listenSharedEvents(handlers = {}) {
-  if (typeof EventSource === 'undefined') return () => {};
-  const source = new EventSource('/api/live');
-  source.onmessage = (msg) => {
-    let event;
+  let last = '';
+  let stopped = false;
+  let source = null;
+
+  const tick = async () => {
+    if (stopped) return;
     try {
-      event = JSON.parse(msg.data);
+      const res = await fetch('/api/world', { cache: 'no-store' });
+      if (!res.ok) return;
+      const world = await res.json();
+      const stamp = `${(world.sightings || []).length}:${world.sightings?.[0]?.id || ''}:${world.liveFight?.id || ''}:${(world.battles || [])[0]?.id || ''}`;
+      if (stamp === last) return;
+      last = stamp;
+      const seen = new Set((state.sightings || []).map((s) => s.id));
+      if (world.liveFight) handlers.onFight?.(world.liveFight);
+      applyRemoteWorld(world);
+      const incoming = (world.sightings || []).find((s) => s?.id && !seen.has(s.id) && !s.mine);
+      if (incoming) handlers.onWorldEvent?.({ type: 'report', sighting: incoming });
     } catch {
-      return;
+      /* keep last good map */
     }
-    const fp = eventFingerprint(event);
-    if (fp && pushed.has(fp)) return;
-    if (event.type === 'fight') {
-      handlers.onFight?.(event.fight);
-      return;
-    }
-    const changed = applyRemoteEvent(event);
-    if (changed) handlers.onWorldEvent?.(event);
   };
-  return () => source.close();
+
+  tick();
+  const iv = setInterval(tick, 4000);
+
+  if (typeof EventSource !== 'undefined') {
+    source = new EventSource('/api/live');
+    source.onmessage = (msg) => {
+      let event;
+      try {
+        event = JSON.parse(msg.data);
+      } catch {
+        return;
+      }
+      const fp = eventFingerprint(event);
+      if (fp && pushed.has(fp)) return;
+      if (event.type === 'fight') {
+        handlers.onFight?.(event.fight);
+        return;
+      }
+      const changed = applyRemoteEvent(event);
+      if (changed) handlers.onWorldEvent?.(event);
+    };
+    source.onerror = () => {
+      source.close();
+      source = null;
+    };
+  }
+
+  return () => {
+    stopped = true;
+    clearInterval(iv);
+    source?.close();
+  };
 }

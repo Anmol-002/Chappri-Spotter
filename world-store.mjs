@@ -8,6 +8,11 @@ const dataDir = process.env.CHAPPRI_STORE_PATH || join(root, 'data');
 const worldFile = join(dataDir, 'world.json');
 const jsonBinId = process.env.JSONBIN_BIN_ID || '';
 const jsonBinKey = process.env.JSONBIN_API_KEY || '';
+const gistId = process.env.CHAPPRI_GIST_ID || '';
+const githubToken = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || '';
+const kvUrl = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || '';
+const kvToken = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || '';
+const serverless = Boolean(process.env.VERCEL);
 
 let world = seedWorld();
 const clients = new Set();
@@ -21,6 +26,74 @@ function cloneWorld(value) {
 
 function validWorld(value) {
   return Boolean(value?.territories?.length && Array.isArray(value.sightings));
+}
+
+function adopt(parsed) {
+  world = mergeStarterWorld(parsed);
+  if (!world.voters) world.voters = {};
+}
+
+async function loadGist() {
+  if (!gistId || !githubToken) return null;
+  const res = await fetch(`https://api.github.com/gists/${gistId}`, {
+    headers: {
+      Accept: 'application/vnd.github+json',
+      Authorization: `Bearer ${githubToken}`,
+      'User-Agent': 'chappri-spotter',
+    },
+  });
+  if (!res.ok) return null;
+  const gist = await res.json();
+  const raw = gist.files?.['world.json']?.content;
+  if (!raw) return null;
+  const parsed = JSON.parse(raw);
+  return validWorld(parsed) ? parsed : null;
+}
+
+async function saveGist(snapshot) {
+  if (!gistId || !githubToken) return false;
+  const res = await fetch(`https://api.github.com/gists/${gistId}`, {
+    method: 'PATCH',
+    headers: {
+      Accept: 'application/vnd.github+json',
+      Authorization: `Bearer ${githubToken}`,
+      'Content-Type': 'application/json',
+      'User-Agent': 'chappri-spotter',
+    },
+    body: JSON.stringify({
+      files: { 'world.json': { content: JSON.stringify(snapshot) } },
+    }),
+  });
+  if (!res.ok) {
+    console.warn('Gist persist failed:', res.status);
+    return false;
+  }
+  return true;
+}
+
+async function loadKv() {
+  if (!kvUrl || !kvToken) return null;
+  const res = await fetch(`${kvUrl}/get/chappri-world`, {
+    headers: { Authorization: `Bearer ${kvToken}` },
+  });
+  if (!res.ok) return null;
+  const json = await res.json();
+  if (!json.result) return null;
+  const parsed = typeof json.result === 'string' ? JSON.parse(json.result) : json.result;
+  return validWorld(parsed) ? parsed : null;
+}
+
+async function saveKv(snapshot) {
+  if (!kvUrl || !kvToken) return false;
+  const res = await fetch(`${kvUrl}/set/chappri-world`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${kvToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(snapshot),
+  });
+  return res.ok;
 }
 
 async function loadJsonBin() {
@@ -38,9 +111,9 @@ async function loadJsonBin() {
 }
 
 async function saveJsonBin(snapshot) {
-  if (!jsonBinId || !jsonBinKey) return;
+  if (!jsonBinId || !jsonBinKey) return false;
   try {
-    await fetch(`https://api.jsonbin.io/v3/b/${jsonBinId}`, {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${jsonBinId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -48,59 +121,86 @@ async function saveJsonBin(snapshot) {
       },
       body: JSON.stringify(snapshot),
     });
+    return res.ok;
   } catch (err) {
     console.warn('JSONBin persist failed:', err.message);
+    return false;
   }
 }
 
-async function loadWorld() {
+async function loadFile() {
   try {
     const raw = await readFile(worldFile, 'utf8');
     const parsed = JSON.parse(raw);
-    if (validWorld(parsed)) {
-      world = mergeStarterWorld(parsed);
-      if (!world.voters) world.voters = {};
-      return;
-    }
+    return validWorld(parsed) ? parsed : null;
   } catch {
-    /* no local snapshot yet */
+    return null;
   }
-  const remote = await loadJsonBin();
-  if (remote) {
-    world = mergeStarterWorld(remote);
-    if (!world.voters) world.voters = {};
-    return;
-  }
-  world = seedWorld();
 }
 
-function schedulePersist() {
+async function saveFile(snapshot) {
+  await mkdir(dataDir, { recursive: true });
+  await writeFile(worldFile, JSON.stringify(snapshot));
+}
+
+async function loadRemote() {
+  return (await loadGist()) || (await loadKv()) || (await loadJsonBin()) || (await loadFile());
+}
+
+let loadedAt = 0;
+
+async function refreshWorld() {
+  if (serverless && Date.now() - loadedAt < 2500 && world?.territories?.length) return;
+  const remote = await loadRemote();
+  if (remote) adopt(remote);
+  else if (!world?.territories?.length) world = seedWorld();
+  if (!world.voters) world.voters = {};
+  loadedAt = Date.now();
+}
+
+async function persist() {
+  const snapshot = cloneWorld(world);
+  const writes = [];
+  if (gistId && githubToken) writes.push(saveGist(snapshot));
+  if (kvUrl && kvToken) writes.push(saveKv(snapshot));
+  if (jsonBinId && jsonBinKey) writes.push(saveJsonBin(snapshot));
+  if (!serverless) writes.push(saveFile(snapshot));
+  if (!writes.length) writes.push(saveFile(snapshot));
+  await Promise.all(writes);
+  loadedAt = Date.now();
+}
+
+async function schedulePersist() {
+  if (serverless) {
+    await persist();
+    return;
+  }
   clearTimeout(persistTimer);
   persistTimer = setTimeout(() => {
     persist().catch((err) => console.warn('world persist failed:', err.message));
   }, 250);
 }
 
-async function persist() {
-  const snapshot = cloneWorld(world);
-  await mkdir(dataDir, { recursive: true });
-  await writeFile(worldFile, JSON.stringify(snapshot));
-  await saveJsonBin(snapshot);
+function hasDurableStore() {
+  return Boolean((gistId && githubToken) || (kvUrl && kvToken) || (jsonBinId && jsonBinKey));
 }
 
 export function bootWorld() {
   if (!ready) {
-    ready = loadWorld().then(() => {
-      if (!jsonBinId || !jsonBinKey) {
-        console.warn('JSONBin is not configured. Render disk is wiped on deploy — user posts will be replayed from each browser.');
+    ready = refreshWorld().then(() => {
+      if (serverless && !hasDurableStore()) {
+        console.warn('No durable store (CHAPPRI_GIST_ID + GITHUB_TOKEN). Posts will not survive deploys.');
       }
-      return persist().catch((err) => console.warn('initial persist failed:', err.message));
+      // Never persist on boot: a failed remote load must not overwrite the gist with seed data.
+      if (!serverless) return persist().catch((err) => console.warn('initial persist failed:', err.message));
     });
   }
   return ready;
 }
 
-export function getPublicWorld() {
+export async function getPublicWorld() {
+  if (serverless) await refreshWorld();
+  else await bootWorld();
   return publicWorld(world);
 }
 
@@ -120,18 +220,25 @@ function broadcast(event) {
   }
 }
 
-process.on('SIGTERM', () => {
+process.on?.('SIGTERM', () => {
   persist().catch(() => {});
 });
-process.on('SIGINT', () => {
+process.on?.('SIGINT', () => {
   persist().catch(() => {});
 });
 
-export function applyEvent(event) {
+export async function applyEvent(event) {
+  if (serverless) {
+    loadedAt = 0;
+    await refreshWorld();
+  } else await bootWorld();
+
   const fp = eventFingerprint(event);
   if (fp && recent.has(fp) && event.type !== 'fight') return { ok: false, reason: 'duplicate' };
   if (event.type === 'fight') {
     if (!event.fight?.id) return { ok: false, reason: 'invalid' };
+    world.liveFight = event.fight;
+    await schedulePersist();
     broadcast(event);
     return { ok: true, liveOnly: true };
   }
@@ -141,7 +248,7 @@ export function applyEvent(event) {
     recent.add(fp);
     setTimeout(() => recent.delete(fp), 60_000);
   }
-  schedulePersist();
+  await schedulePersist();
   broadcast(event);
   return { ok: true };
 }

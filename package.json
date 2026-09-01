@@ -9,7 +9,8 @@
   },
   "scripts": {
     "start": "node server.mjs",
-    "smoke": "node tools/smoke-v3.mjs"
+    "smoke": "node tools/smoke-v3.mjs",
+    "loadtest": "node tools/load-test.mjs"
   },
   "devDependencies": {
     "puppeteer-core": "^25.9.0"

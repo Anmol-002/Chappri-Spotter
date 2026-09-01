@@ -79,7 +79,7 @@ createServer(async (req, res) => {
   }
 
   if (req.method === 'GET' && url.pathname === '/api/world') {
-    return send(res, 200, getPublicWorld());
+    return send(res, 200, await getPublicWorld());
   }
 
   if (req.method === 'GET' && url.pathname === '/api/live') {
@@ -97,7 +97,7 @@ createServer(async (req, res) => {
   if (req.method === 'POST' && url.pathname === '/api/event') {
     try {
       const event = await readJson(req);
-      const result = applyEvent(event);
+      const result = await applyEvent(event);
       return send(res, result.ok ? 200 : 409, result);
     } catch (err) {
       return send(res, 400, { ok: false, reason: err.message || 'bad request' });
