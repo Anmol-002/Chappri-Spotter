@@ -334,7 +334,7 @@ function updateNsfwBtn() {
   btn.classList.remove('on');
   btn.classList.add('locked');
   btn.setAttribute('aria-disabled', 'true');
-  btn.innerHTML = `<span class="nsfw-icon">🔞</span><span class="nsfw-text">NSFW: OFF</span>`;
+  btn.innerHTML = `<span class="nsfw-icon">🔞</span><span class="nsfw-text">NSFW: OFF</span><span class="nsfw-short">18+</span>`;
   $('#baddieHelp')?.classList.add('hidden');
 }
 
@@ -624,7 +624,7 @@ const TOUR_STEPS = [
   {
     icon: '🔞',
     title: 'FILTERS + AFTER DARK',
-    body: 'SHOW ME filters the map to real posts. The faded NSFW button is After Dark — off on purpose. Click it anyway if you are naughty. Not suitable for LinkedIn.',
+    body: 'SHOW ME filters the map to real posts. The NSFW button up top is After Dark — off on purpose. Not suitable for LinkedIn. Or your intern. Or your intern’s intern.',
   },
 ];
 

@@ -264,8 +264,8 @@ sup { color: var(--lime); font-size: 7px; }
   flex: none;
 }
 .nsfw-toggle {
-  background: #190a14;
-  border: 1px solid #5a1940;
+  background: #2a1020;
+  border: 1px solid #ff2fb0;
   color: #ff8ad0;
   padding: 8px 11px;
   font: 700 9.5px var(--mono);
@@ -274,23 +274,21 @@ sup { color: var(--lime); font-size: 7px; }
   display: flex;
   align-items: center;
   gap: 6px;
-  opacity: 0.4;
-  filter: saturate(0.35) brightness(0.92);
-  transition: opacity 0.2s, filter 0.2s, border-color 0.15s, box-shadow 0.15s, color 0.15s;
+  opacity: 1;
+  filter: none;
+  box-shadow: 0 0 10px #ff2fb055;
+  transition: border-color 0.15s, box-shadow 0.15s, color 0.15s, background 0.15s;
 }
 .nsfw-toggle:hover {
-  opacity: 0.72;
-  filter: saturate(0.75);
-  border-color: var(--pink);
   color: #fff;
-  box-shadow: 0 0 10px #ff2fb044;
+  border-color: #ff8ad0;
+  background: #41142f;
+  box-shadow: 0 0 16px #ff2fb088;
 }
 .nsfw-toggle.locked {
   cursor: pointer;
 }
-.nsfw-toggle.locked:hover {
-  opacity: 0.78;
-}
+.nsfw-short { display: none; }
 .nsfw-hint {
   position: absolute;
   top: calc(100% + 8px);
@@ -1931,7 +1929,9 @@ textarea {
   .header-actions { grid-area: actions; justify-self: end; gap: 6px; }
   .ticker, .live-pill { display: none; }
   .nsfw-text { display: none; }
+  .nsfw-short { display: inline; }
   .nsfw-toggle { padding: 8px 10px; min-height: 40px; }
+  .nsfw-icon { font-size: 16px; line-height: 1; }
   .nsfw-hint { max-width: 160px; font-size: 9px; }
   .sound-toggle { width: 40px; height: 40px; }
   .report-full, .locate-full { display: none; }
