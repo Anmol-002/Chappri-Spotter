@@ -102,9 +102,12 @@ try {
   await starter.waitForSelector('#searchResults.hidden');
   if (await starter.$('#searchClear:not(.hidden)')) await starter.click('#searchClear');
 
-  /* --- 4. Report form has no photo upload --- */
-  step('testing report form is category + intensity only');
+  /* --- 4. Report location choice + map-pin form --- */
+  step('testing report location choice and pin flow');
   await starter.$eval('#reportButton', (el) => el.click());
+  await starter.waitForSelector('#reportDialog[open] #reportElsewhere');
+  check('report opens a current-location or map-pin choice', Boolean(await starter.$('#reportCurrent')) && Boolean(await starter.$('#reportElsewhere')));
+  await starter.$eval('#reportElsewhere', (el) => el.click());
   await starter.waitForSelector('#pinBanner:not(.hidden)');
   await starter.$eval('.char-icon img', (el) => el.click());
   await starter.waitForSelector('#reportDialog[open]');
@@ -224,6 +227,8 @@ try {
   if (await phone.$('#searchClear:not(.hidden)')) await phone.click('#searchClear');
 
   await phone.$eval('#reportButton', (el) => el.click());
+  await phone.waitForSelector('#reportDialog[open] #reportElsewhere');
+  await phone.$eval('#reportElsewhere', (el) => el.click());
   await phone.waitForSelector('#pinBanner:not(.hidden)');
   check('report pin mode works on phone', await phone.evaluate(() => document.getElementById('map').classList.contains('picking')));
   await phone.screenshot({ path: `${SHOTS}/06-report.png` });

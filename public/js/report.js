@@ -7,6 +7,7 @@ import { $, celebrate, el, shake, toast } from './ui.js';
 const dialog = () => $('#reportDialog');
 let draft = null;
 let hooks = {};
+let preserveNextPinCancel = false;
 
 export function setupReport(callbacks) {
   hooks = callbacks;
@@ -18,7 +19,49 @@ export function beginReport() {
   $('#pinBanner').classList.remove('hidden');
 }
 
+/** Let the header offer a fast GPS report without hiding the map-pin flow. */
+export function chooseReportLocation(currentCoords) {
+  clearPin();
+  $('#pinBanner').classList.add('hidden');
+  const hasLocation = Array.isArray(currentCoords) && currentCoords.length === 2;
+  const body = $('#reportBody');
+  body.innerHTML = `
+    <div class="eyebrow">FIELD AGENT SUBMISSION · STEP 1</div>
+    <h2>Where did you spot it?</h2>
+    <p class="muted">Use your current location for a quick report, or drop a pin somewhere else. We score places, never people.</p>
+    <div class="report-location-choice">
+      <button class="submit" id="reportCurrent" ${hasLocation ? '' : 'disabled'}>
+        📍 REPORT MY CURRENT LOCATION
+        <small>${hasLocation ? 'Log it exactly where you are standing.' : 'Tap MY LOCATION first so we can find you.'}</small>
+      </button>
+      <button class="ghost-wide" id="reportElsewhere">
+        🗺️ PICK ANOTHER PLACE
+        <small>Drop and drag a pin anywhere on the map.</small>
+      </button>
+    </div>
+  `;
+  dialog().showModal();
+
+  $('#reportCurrent')?.addEventListener('click', () => {
+    if (!hasLocation) return;
+    draft = { coords: [...currentCoords], categoryId: null, intensity: 3, note: '', scan: null, placeName: '' };
+    renderForm();
+  });
+  $('#reportElsewhere')?.addEventListener('click', () => {
+    // The dialog's close listener normally clears pin mode. Preserve this
+    // freshly armed one while it performs old-dialog cleanup.
+    preserveNextPinCancel = true;
+    beginReport();
+    dialog().close();
+    hooks.onPickElsewhere?.();
+  });
+}
+
 export function cancelPin() {
+  if (preserveNextPinCancel) {
+    preserveNextPinCancel = false;
+    return;
+  }
   clearPin();
   $('#pinBanner').classList.add('hidden');
 }

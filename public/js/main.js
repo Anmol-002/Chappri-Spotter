@@ -3,7 +3,7 @@ import { openBattlePicker, setupBattles } from './battles.js';
 import { playNaughtyTease, playSound, setAfterDarkAmbience, unlockAudio } from './combat.js';
 import { animateFight, focusCoords, focusTerritory, geocodeSearch, initMap, invalidate, layerOptionsHtml, locateMe, openSightingPopup, popCharacter, renderMap, searchLocations, watchUserPosition, worldPlaceSearch } from './map.js';
 import { hideDossier, openAreaPostsModal, renderDossier, renderLegend, renderSidebar, setupPanels, sightingCard } from './panels.js';
-import { beginReport, cancelPin, onPinMoved, onPinPlaced, setupReport } from './report.js';
+import { beginReport, cancelPin, chooseReportLocation, onPinMoved, onPinPlaced, setupReport } from './report.js';
 import { openShareCard } from './share.js';
 import { hydrateSharedWorld, listenSharedEvents, pushSharedEvent } from './sync.js';
 import { activeLayers, bandFor, cityThreat, fightIsNearby, homeCoords, homeLabel, isTerritoryAroundHome, levelFor, load, localCityThreat, markBriefingSeen, markGpsDenied, recordBattle, reloadData, resetAll, setHomeLocation, setLayer, setNsfwMode, setSelected, setSoundMuted, state, subscribe, territoryById, vibeScore, voteSighting } from './state.js';
@@ -121,6 +121,9 @@ lockOntoUser();
 
 $('#locateButton').onclick = () => {
   clearLocationSearch();
+  // Location is a camera action, not an instruction to open an area card.
+  setSelected(null);
+  hideDossier();
   const cached = getUserCoords() || readSavedGps();
   toast({
     icon: '📡',
@@ -131,10 +134,6 @@ $('#locateButton').onclick = () => {
   locateMe(
     (coords, near) => {
       applyHome(coords, near);
-      if (near?.territory && near.inRadius) {
-        setSelected(near.territory.id);
-        renderDossier(near.territory.id);
-      }
       playSound('punch');
     },
     () => {
@@ -389,9 +388,14 @@ $('#soundToggle')?.addEventListener('click', () => {
 /* ---------- flows ---------- */
 
 setupReport({
+  onPickElsewhere: () => {
+    toast({ icon: '📍', title: 'PIN MODE ARMED', body: 'Tap anywhere on the map, then drag the pin if the chaos is standing slightly to the left.', ms: 4200 });
+  },
   onWantBattle: (id) => openBattlePicker(id),
   onWantShare: (id) => openShareCard(id),
   onReported: (result) => {
+    // A report should never disappear behind the user's previous map filter.
+    setLayer(result.category.stat);
     setSelected(result.territory.id);
     renderDossier(result.territory.id);
     publish({
@@ -464,10 +468,7 @@ setupPanels({
 $('#reportButton').onclick = () => {
   closeFeed();
   hideDossier();
-  beginReport();
-  if (window.innerWidth >= 860) {
-    toast({ icon: '📍', title: 'PIN MODE ARMED', body: 'Tap anywhere on the map to place your sighting.', ms: 3200 });
-  }
+  chooseReportLocation(homeCoords());
 };
 
 $('#resetCity').onclick = () => {
@@ -623,7 +624,7 @@ const TOUR_STEPS = [
   {
     icon: '🚨',
     title: 'SAW ONE? MARK THE MAP',
-    body: 'Just spotted a chappri, baddie, or another species of public menace? Hit the report button at the top, choose the sighting, drop it on the map, and write the field notes. No names—only vibes.',
+    body: 'Just spotted a chappri, baddie, or another species of public menace? Hit the report button at the top, choose your current location or drop a pin elsewhere, then write the field notes. No names—only vibes.',
   },
   {
     icon: '🗺️',

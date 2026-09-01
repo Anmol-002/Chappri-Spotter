@@ -1900,6 +1900,11 @@ textarea {
 .quick-guide b { color: var(--ink); }
 .briefing-risk { margin: 0 0 14px; color: #ff8ad0; font: 11px var(--mono); }
 
+.report-location-choice { display: grid; gap: 10px; margin-top: 18px; }
+.report-location-choice button { min-height: 66px; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
+.report-location-choice small { font: 10px var(--mono); font-weight: 400; opacity: 0.8; }
+.report-location-choice button:disabled { cursor: not-allowed; opacity: 0.48; }
+
 .baddie-help { margin-top: auto; border: 1px solid #6d2451; background: linear-gradient(135deg, #271023, #120e15); padding: 11px; }
 .baddie-help-kicker { color: #ff8ad0; font: 8px var(--mono); letter-spacing: 1px; margin-bottom: 5px; }
 .baddie-help strong { display: block; color: #fff0f8; font-size: 12px; }
