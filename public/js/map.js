@@ -359,7 +359,7 @@ export function animateFight(fight, { focus = false, compact = false, announce =
 
   const fightHtml = buildFightHtml(fight, a, b, aChar, bChar, winner, loser);
   const html = compact
-    ? `<div class="observer-fight-wrap">${fightHtml}<div class="observer-fight-hint">TAP TO ZOOM</div></div>`
+    ? `<div class="observer-fight-wrap">${fightHtml}</div>`
     : fightHtml;
   const phone = window.innerWidth < 860;
   const size = compact ? (phone ? [132, 98] : [168, 124]) : phone ? [300, 230] : [420, 310];

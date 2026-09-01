@@ -144,6 +144,11 @@ export function renderDossier(id) {
     <p class="dossier-note">“${band.note}”</p>
     <p class="dossier-lead">${lead?.reports ? `${lead.emoji} Mostly ${lead.label.toLowerCase()} · ${recent.length} post${recent.length === 1 ? '' : 's'}` : `${recent.length} post${recent.length === 1 ? '' : 's'} on record`}</p>
 
+    <div class="dossier-actions">
+      <button class="submit" data-act="report"><span class="report-full">+ REPORT HERE</span><span class="report-short">+ REPORT</span></button>
+      <button class="ghost-wide fight-button" data-act="battle">${nsfw ? '💋 START A SITUATIONSHIP' : '<span class="fight-full">🥊 CHALLENGE A NEIGHBOUR</span><span class="fight-short">🥊 FIGHT</span>'}</button>
+    </div>
+
     <div class="dossier-recent">
       ${
         recent.length
@@ -163,11 +168,6 @@ export function renderDossier(id) {
           : '<p class="empty-posts">Quiet so far. Be the first to log it.</p>'
       }
       ${recent.length > 2 ? `<button class="view-all-btn" data-act="view-all">VIEW ALL ${recent.length} POSTS →</button>` : ''}
-    </div>
-
-    <div class="dossier-actions">
-      <button class="submit" data-act="report"><span class="report-full">+ REPORT HERE</span><span class="report-short">+ REPORT</span></button>
-      <button class="ghost-wide fight-button" data-act="battle">${nsfw ? '💋 START A SITUATIONSHIP' : '<span class="fight-full">🥊 CHALLENGE A NEIGHBOUR</span><span class="fight-short">🥊 FIGHT</span>'}</button>
     </div>`;
 
   box.querySelector('.dossier-x').onclick = () => hooks.onCloseDossier?.();
