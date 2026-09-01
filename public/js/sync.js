@@ -54,6 +54,7 @@ export function listenSharedEvents(handlers = {}) {
   let last = '';
   let stopped = false;
   let source = null;
+  let reconnectTimer = null;
 
   const tick = async () => {
     if (stopped) return;
@@ -75,35 +76,43 @@ export function listenSharedEvents(handlers = {}) {
   };
 
   tick();
-  const iv = setInterval(tick, 4000);
+  // EventSource is the fast path; this catches dropped connections and hosts
+  // that do not keep SSE streams open reliably.
+  const iv = setInterval(tick, 1500);
 
   if (typeof EventSource !== 'undefined') {
-    source = new EventSource('/api/live');
-    source.onmessage = (msg) => {
-      let event;
-      try {
-        event = JSON.parse(msg.data);
-      } catch {
-        return;
-      }
-      const fp = eventFingerprint(event);
-      if (fp && pushed.has(fp)) return;
-      if (event.type === 'fight') {
-        handlers.onFight?.(event.fight);
-        return;
-      }
-      const changed = applyRemoteEvent(event);
-      if (changed) handlers.onWorldEvent?.(event);
+    const connect = () => {
+      if (stopped || source) return;
+      source = new EventSource('/api/live');
+      source.onmessage = (msg) => {
+        let event;
+        try {
+          event = JSON.parse(msg.data);
+        } catch {
+          return;
+        }
+        const fp = eventFingerprint(event);
+        if (fp && pushed.has(fp)) return;
+        if (event.type === 'fight') {
+          handlers.onFight?.(event.fight);
+          return;
+        }
+        const changed = applyRemoteEvent(event);
+        if (changed) handlers.onWorldEvent?.(event);
+      };
+      source.onerror = () => {
+        source?.close();
+        source = null;
+        if (!stopped) reconnectTimer = setTimeout(connect, 750);
+      };
     };
-    source.onerror = () => {
-      source.close();
-      source = null;
-    };
+    connect();
   }
 
   return () => {
     stopped = true;
     clearInterval(iv);
+    clearTimeout(reconnectTimer);
     source?.close();
   };
 }

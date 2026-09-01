@@ -494,7 +494,8 @@ function startFight(fight) {
   const result = recordBattle({ a, b, rounds: fight.rounds, winner, vote: null });
   celebrate(result.levelUp, result.unlocked);
   pushSharedEvent(result.sharedEvent);
-  const live = { ...fight, expiresAt: Date.now() + 8200 };
+  // Keep the event alive long enough for a reconnecting client to receive it.
+  const live = { ...fight, expiresAt: Date.now() + 16_000 };
   seenFights.add(live.id);
   localStorage.setItem(LIVE_KEY, JSON.stringify(live));
   publish({ type: 'fight', fight: live });

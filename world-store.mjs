@@ -238,8 +238,10 @@ export async function applyEvent(event) {
   if (event.type === 'fight') {
     if (!event.fight?.id) return { ok: false, reason: 'invalid' };
     world.liveFight = event.fight;
-    await schedulePersist();
+    // A durable remote write can take seconds. Broadcast the transient fight
+    // immediately so it is still live for connected viewers.
     broadcast(event);
+    schedulePersist().catch((err) => console.warn('live fight persist failed:', err.message));
     return { ok: true, liveOnly: true };
   }
   const changed = applySharedEvent(world, event);
