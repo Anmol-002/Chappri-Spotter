@@ -6,7 +6,7 @@ import { hideDossier, openAreaPostsModal, renderDossier, renderLegend, renderSid
 import { beginReport, cancelPin, chooseReportLocation, onPinMoved, onPinPlaced, setupReport } from './report.js';
 import { openShareCard } from './share.js';
 import { hydrateSharedWorld, listenSharedEvents, pushSharedEvent } from './sync.js';
-import { activeLayers, bandFor, cityThreat, homeCoords, homeLabel, isTerritoryAroundHome, levelFor, load, localCityThreat, markBriefingSeen, markGpsDenied, recordBattle, reloadData, resetAll, setHomeLocation, setLayer, setNsfwMode, setSelected, setSoundMuted, state, subscribe, territoryById, vibeScore, voteSighting } from './state.js';
+import { activeLayers, bandFor, cityThreat, fightIsNearby, homeCoords, homeLabel, isTerritoryAroundHome, levelFor, load, localCityThreat, markBriefingSeen, markGpsDenied, recordBattle, reloadData, resetAll, setHomeLocation, setLayer, setNsfwMode, setSelected, setSoundMuted, state, subscribe, territoryById, vibeScore, voteSighting } from './state.js';
 import { $, celebrate, toast, wireDialogClose } from './ui.js';
 
 load();
@@ -509,7 +509,10 @@ function startFight(fight) {
 function observeFight(fight) {
   if (!fight || fight.expiresAt <= Date.now() || seenFights.has(fight.id)) return;
   seenFights.add(fight.id);
-  animateFight(fight, { focus: false, compact: true });
+  const nearby = fightIsNearby(fight);
+  // Everyone can watch the compact arena, but only local fights interrupt the UI.
+  animateFight(fight, { focus: false, compact: true, announce: nearby });
+  if (!nearby) return;
   const a = territoryById(fight.a);
   const b = territoryById(fight.b);
   toast({

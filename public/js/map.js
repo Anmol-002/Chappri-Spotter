@@ -343,7 +343,7 @@ export function popCharacter(id, text) {
 }
 
 /* ---------- Upgraded Combat Arena Animation ---------- */
-export function animateFight(fight, { focus = false, compact = false, onDone } = {}) {
+export function animateFight(fight, { focus = false, compact = false, announce = true, onDone } = {}) {
   const a = territoryById(fight.a);
   const b = territoryById(fight.b);
   if (!a || !b) return;
@@ -389,7 +389,7 @@ export function animateFight(fight, { focus = false, compact = false, onDone } =
   }, 9000);
 
   const note = document.querySelector('#liveFightNote');
-  if (note) {
+  if (announce && note) {
     note.classList.remove('hidden');
     const verb = nsfw ? 'caught in a situationship with' : 'throwing down with';
     note.innerHTML = compact
@@ -408,7 +408,7 @@ export function animateFight(fight, { focus = false, compact = false, onDone } =
         resizeCharacters();
         note?.classList.add('hidden');
         onDone?.();
-      });
+      }, { silent: compact && !announce });
     } else {
       setTimeout(() => {
         fightLayer.removeLayer(marker);

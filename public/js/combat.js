@@ -678,7 +678,10 @@ function shakeArena(container) {
   setTimeout(() => arena.classList.remove('arena-shake'), 220);
 }
 
-function runMakeoutSequence(container, a, b, winner, loser, onDone) {
+function runMakeoutSequence(container, a, b, winner, loser, onDone, { silent = false } = {}) {
+  const sound = (type) => {
+    if (!silent) playSound(type);
+  };
   const hpAFill = container.querySelector('#hpAFill');
   const hpBFill = container.querySelector('#hpBFill');
   const hpAVal = container.querySelector('#hpAVal');
@@ -732,9 +735,9 @@ function runMakeoutSequence(container, a, b, winner, loser, onDone) {
       fxText.classList.add('pop-text');
       later(() => fxText.classList.remove('pop-text'), 320);
     }
-    playSound('kiss_smooch');
-    if (combo % 2 === 0) playSound('heartbeat');
-    if (combo === 3) playSound('breath');
+    sound('kiss_smooch');
+    if (combo % 2 === 0) sound('heartbeat');
+    if (combo === 3) sound('breath');
   }
 
   function finish(early) {
@@ -745,7 +748,7 @@ function runMakeoutSequence(container, a, b, winner, loser, onDone) {
     heartsRain?.classList.add('show-hearts');
     lipstick?.classList.add('show-lips');
     combatVerdict?.classList.add('show-verdict');
-    playSound(early ? 'kiss_smooch' : 'cheer');
+    sound(early ? 'kiss_smooch' : 'cheer');
     later(() => onDone?.(), 1800);
   }
 
@@ -754,8 +757,8 @@ function runMakeoutSequence(container, a, b, winner, loser, onDone) {
   later(() => {
     bubbleA?.classList.add('show-bubble');
     bubbleB?.classList.add('show-bubble');
-    playSound('sultry_whisper');
-    playSound('heartbeat');
+    sound('sultry_whisper');
+    sound('heartbeat');
   }, 180);
 
   later(() => {
@@ -768,7 +771,7 @@ function runMakeoutSequence(container, a, b, winner, loser, onDone) {
   later(() => {
     kiss('B');
     setRizz('B', 16);
-    playSound('breath');
+    sound('breath');
   }, 1400);
 
   later(() => {
@@ -783,26 +786,33 @@ function runMakeoutSequence(container, a, b, winner, loser, onDone) {
     fighterB?.classList.add('makeout-lock');
     kiss('B');
     setRizz('B', 24);
-    playSound('sultry_whisper');
+    sound('sultry_whisper');
   }, 2700);
 
   later(() => {
     kiss('A');
     if (winner.id === a.id) setRizz('A', 40);
     else setRizz('B', 40);
-    playSound('kiss_smooch');
-    playSound('heartbeat');
+    sound('kiss_smooch');
+    sound('heartbeat');
   }, 3600);
 
   later(() => finish(false), 4600);
 }
 
 /* ---------- Dynamic Battle Choreography Execution ---------- */
-export function runCombatSequence(container, fight, a, b, aChar, bChar, winner, loser, onDone) {
+export function runCombatSequence(container, fight, a, b, aChar, bChar, winner, loser, onDone, { silent = false } = {}) {
   if (state.ui.nsfw) {
-    runMakeoutSequence(container, a, b, winner, loser, onDone);
+    runMakeoutSequence(container, a, b, winner, loser, onDone, { silent });
     return;
   }
+
+  const sound = (type) => {
+    if (!silent) playSound(type);
+  };
+  const speak = (character) => {
+    if (!silent) speakCharacterLine(character, { fight: true });
+  };
 
   const isBaddieFight = aChar === 'baddie' || bChar === 'baddie';
   const hpAFill = container.querySelector('#hpAFill');
@@ -872,10 +882,10 @@ export function runCombatSequence(container, fight, a, b, aChar, bChar, winner, 
       later(() => fxText.classList.remove('pop-text'), 320);
     }
 
-    if (hitType === 'slap') playSound('slap');
-    else if (hitType === 'hair') playSound('hair_pull');
-    else if (hitType === 'honk') playSound('honk');
-    else playSound('punch');
+    if (hitType === 'slap') sound('slap');
+    else if (hitType === 'hair') sound('hair_pull');
+    else if (hitType === 'honk') sound('honk');
+    else sound('punch');
   }
 
   function finish(early) {
@@ -892,7 +902,7 @@ export function runCombatSequence(container, fight, a, b, aChar, bChar, winner, 
       updateHp('A', 100);
     }
     combatVerdict?.classList.add('show-verdict');
-    playSound(early ? 'ko' : 'cheer');
+    sound(early ? 'ko' : 'cheer');
     later(() => onDone?.(), 1800);
   }
 
@@ -901,8 +911,8 @@ export function runCombatSequence(container, fight, a, b, aChar, bChar, winner, 
   later(() => {
     bubbleA?.classList.add('show-bubble');
     bubbleB?.classList.add('show-bubble');
-    playSound('whoosh');
-    speakCharacterLine(aChar, { fight: true });
+    sound('whoosh');
+    speak(aChar);
   }, 160);
 
   later(() => {
@@ -915,7 +925,7 @@ export function runCombatSequence(container, fight, a, b, aChar, bChar, winner, 
   later(() => {
     triggerHit('B', 'punch', 'FATAK!');
     updateHp('A', 12);
-    speakCharacterLine(bChar, { fight: true });
+    speak(bChar);
   }, 1100);
 
   later(() => {
@@ -939,7 +949,7 @@ export function runCombatSequence(container, fight, a, b, aChar, bChar, winner, 
         bubbleA.textContent = getShout(aChar, false);
         bubbleA.classList.add('show-bubble');
       }
-      speakCharacterLine(aChar, { fight: true });
+      speak(aChar);
     } else if (aChar === 'chapri' || bChar === 'chapri') {
       triggerHit('A', 'punch', '🩴 CHAPPAL TOSS!');
       updateHp('B', 20);
@@ -968,7 +978,7 @@ export function runCombatSequence(container, fight, a, b, aChar, bChar, winner, 
 
   later(() => {
     triggerHit(winner.id === a.id ? 'A' : 'B', isBaddieFight ? 'slap' : 'punch', '💥 ULTRA K.O.!');
-    playSound('ko');
+    sound('ko');
   }, 3800);
 
   later(() => finish(false), 4500);
