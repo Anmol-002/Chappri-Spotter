@@ -9,7 +9,7 @@ await page.goto('http://localhost:4173', { waitUntil: 'domcontentloaded' });
 await page.evaluate(() => localStorage.clear());
 await page.reload({ waitUntil: 'domcontentloaded' });
 await page.waitForSelector('.char-icon');
-if (await page.$('#briefingDialog[open]')) await page.click('#briefingStart');
+if (await page.$('#briefingDialog[open]')) await page.click('#tourSkip');
 
 await page.click('.char-icon img');
 await page.waitForSelector('#dossier:not(.hidden)');

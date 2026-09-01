@@ -9,12 +9,11 @@ await page.goto('http://localhost:4173', { waitUntil: 'domcontentloaded' });
 await page.evaluate(() => localStorage.clear());
 await page.reload({ waitUntil: 'domcontentloaded' });
 await page.waitForSelector('.char-icon');
-if (await page.$('#briefingDialog[open]')) await page.click('#briefingStart');
+if (await page.$('#briefingDialog[open]')) await page.click('#tourSkip');
 
-// Enable NSFW
+// NSFW is locked off on purpose — click should tease, not enable
 await page.click('#nsfwToggle');
-await page.waitForFunction(() => document.body.classList.contains('nsfw-mode'));
-console.log('nsfw-mode active');
+console.log('nsfw-mode active:', await page.evaluate(() => document.body.classList.contains('nsfw-mode')));
 
 // Try __testOpenReport
 const hasHelper = await page.evaluate(() => typeof window.__testOpenReport);

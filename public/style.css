@@ -259,6 +259,10 @@ sup { color: var(--lime); font-size: 7px; }
 .header-actions { display: flex; gap: 8px; align-items: center; flex: none; }
 
 /* 18+ NSFW Toggle Button */
+.nsfw-wrap {
+  position: relative;
+  flex: none;
+}
 .nsfw-toggle {
   background: #190a14;
   border: 1px solid #5a1940;
@@ -270,21 +274,46 @@ sup { color: var(--lime); font-size: 7px; }
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.15s;
+  opacity: 0.4;
+  filter: saturate(0.35) brightness(0.92);
+  transition: opacity 0.2s, filter 0.2s, border-color 0.15s, box-shadow 0.15s, color 0.15s;
 }
-
 .nsfw-toggle:hover {
+  opacity: 0.72;
+  filter: saturate(0.75);
   border-color: var(--pink);
   color: #fff;
   box-shadow: 0 0 10px #ff2fb044;
 }
-
-.nsfw-toggle.on {
-  background: linear-gradient(135deg, #c4005b, #ff2fb0);
-  color: #fff;
-  border-color: #ff8ad0;
-  box-shadow: 0 0 14px #ff2fb088;
-  animation: pulseNeon 2s infinite;
+.nsfw-toggle.locked {
+  cursor: pointer;
+}
+.nsfw-toggle.locked:hover {
+  opacity: 0.78;
+}
+.nsfw-hint {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 40;
+  width: max-content;
+  max-width: 230px;
+  padding: 8px 10px;
+  background: #1a0d16;
+  border: 1px solid #ff2fb0;
+  color: #ffd7eb;
+  font: 600 10px 'Space Grotesk', sans-serif;
+  letter-spacing: 0.2px;
+  line-height: 1.35;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: opacity 0.18s, transform 0.18s;
+  box-shadow: 0 10px 24px #0009;
+}
+.nsfw-hint.show {
+  opacity: 1;
+  transform: none;
 }
 
 @keyframes pulseNeon {
@@ -392,6 +421,25 @@ main { height: calc(100dvh - 64px); flex: 1; min-height: 0; display: flex; }
 .nsfw-tag { font-style: normal; background: #3d0d29; color: #ff8ad0; padding: 1px 4px; font-size: 8px; font-family: var(--mono); margin-left: 4px; }
 .feed-item p { font-size: 11px; color: #9fada9; margin: 2px 0; }
 .feed-item small { font: 9px var(--mono); color: #5f6d69; }
+
+.elsewhere-card {
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px dashed #3a4a46;
+  background: #101917;
+}
+.elsewhere-card b { display: block; font-size: 13px; margin-bottom: 6px; }
+.elsewhere-card p { margin: 0 0 10px; color: #9fada9; font-size: 12px; line-height: 1.45; }
+.elsewhere-go {
+  width: 100%;
+  border: 1px solid var(--lime);
+  background: #152019;
+  color: var(--lime);
+  min-height: 36px;
+  font: 700 10px var(--mono);
+  cursor: pointer;
+}
+.elsewhere-go:hover { background: var(--lime); color: #07100d; }
 
 .privacy-note { font: 9px var(--mono); color: #6d7b77; border-top: 1px solid var(--line); padding-top: 12px; line-height: 1.6; }
 .privacy-note span { color: #4c5955; }
@@ -1800,9 +1848,28 @@ textarea {
 /* briefing + share */
 
 .briefing { text-align: center; }
-.briefing h1 { font-size: 38px; letter-spacing: -1px; margin: 10px 0; }
-.briefing .lead { font-size: 16px; color: #b9c5c1; line-height: 1.6; margin-bottom: 18px; }
+.briefing h1 { font-size: 32px; letter-spacing: -1px; margin: 8px 0 10px; }
+.briefing .lead { font-size: 15px; color: #b9c5c1; line-height: 1.6; margin: 0 0 18px; }
 .briefing .lead strong { color: var(--red); }
+.briefing.tour { position: relative; padding-top: 8px; }
+.tour-skip {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: none;
+  border: 0;
+  color: #7c8a88;
+  font: 700 10px var(--mono);
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+.tour-skip:hover { color: var(--lime); }
+.tour-step-icon { font-size: 42px; line-height: 1; margin: 8px 0 4px; }
+.tour-dots { display: flex; justify-content: center; gap: 7px; margin: 4px 0 16px; }
+.tour-dots i { width: 7px; height: 7px; border-radius: 50%; background: #2a3835; display: block; }
+.tour-dots i.on { background: var(--lime); box-shadow: 0 0 8px #d3ff3666; }
+.tour-nav { display: flex; gap: 8px; }
+.tour-nav .submit, .tour-nav .ghost-wide { flex: 1; }
 .briefing ul { list-style: none; padding: 0; margin: 0 0 18px; text-align: left; }
 .briefing li { display: flex; justify-content: space-between; border-bottom: 1px solid #172120; padding: 9px 2px; font-size: 12.5px; }
 .briefing li span { font: 10px var(--mono); }
@@ -1865,6 +1932,7 @@ textarea {
   .ticker, .live-pill { display: none; }
   .nsfw-text { display: none; }
   .nsfw-toggle { padding: 8px 10px; min-height: 40px; }
+  .nsfw-hint { max-width: 160px; font-size: 9px; }
   .sound-toggle { width: 40px; height: 40px; }
   .report-full, .locate-full { display: none; }
   .report-short, .locate-short { display: inline; }
@@ -2073,8 +2141,9 @@ textarea {
   }
   dialog.wide { width: calc(100vw - 16px); }
   dialog h2 { font-size: 20px; }
-  .briefing h1 { font-size: 26px; }
+  .briefing h1 { font-size: 24px; }
   .briefing .lead { font-size: 14px; }
+  .tour-step-icon { font-size: 34px; }
   .briefing .quick-guide { gap: 3px; margin-bottom: 10px; }
   .briefing .quick-guide li { padding: 6px 2px; gap: 7px; }
   .quick-guide li > span { font-size: 15px; }

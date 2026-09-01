@@ -7,6 +7,8 @@ const KEY = 'chappri-spotter-v4';
 const NEIGHBOUR_RADIUS_KM = 11;
 const MAX_NEIGHBOURS = 5;
 const COMBO_WINDOW_MS = 3 * 60 * 1000;
+export const HOME_RADIUS_KM = 48;
+export const FIGHT_RADIUS_KM = 40;
 
 const listeners = new Set();
 
@@ -15,7 +17,7 @@ export const state = {
   sightings: [],
   battles: [],
   agent: { xp: 0, reports: 0, confirms: 0, battles: 0, scans: 0, combo: 0, lastReportAt: 0, achievements: [], byStat: {}, voted: {}, postedIds: [], voterId: '' },
-  ui: { layer: 'chaos', selected: null, seenBriefing: false, layerLeader: null, nsfw: false, soundMuted: false },
+  ui: { layer: 'chaos', selected: null, seenBriefing: false, layerLeader: null, nsfw: false, soundMuted: false, homeCoords: null, homeLabel: '', gpsDenied: false },
   _voters: {},
 };
 
@@ -77,7 +79,7 @@ export function load() {
     });
   }
   state.battles = saved?.battles || [];
-  state.ui.seenBriefing = Boolean(saved?.ui?.seenBriefing);
+  state.ui.seenBriefing = Boolean(saved?.ui?.seenIntroV2);
   state.ui.layer = saved?.ui?.layer || 'chaos';
   state.ui.nsfw = Boolean(saved?.ui?.nsfw);
   state.ui.soundMuted = Boolean(saved?.ui?.soundMuted);
@@ -111,7 +113,7 @@ function save() {
     battles,
     agent,
     ui: {
-      seenBriefing: state.ui.seenBriefing,
+      seenIntroV2: state.ui.seenBriefing,
       layer: state.ui.layer,
       nsfw: state.ui.nsfw,
       soundMuted: state.ui.soundMuted,
@@ -224,6 +226,88 @@ export function distanceKm(a, b) {
 }
 
 export const territoryById = (id) => state.territories.find((t) => t.id === id);
+
+export function homeCoords() {
+  return state.ui.homeCoords ? [...state.ui.homeCoords] : null;
+}
+
+export function homeLabel() {
+  return state.ui.homeLabel || '';
+}
+
+export function setHomeLocation(coords, label, { silent = false } = {}) {
+  if (!coords) return;
+  state.ui.homeCoords = [...coords];
+  state.ui.gpsDenied = false;
+  if (label) state.ui.homeLabel = label;
+  if (!silent) emit({ type: 'home' });
+}
+
+export function markGpsDenied() {
+  state.ui.gpsDenied = true;
+}
+
+export function isAroundHome(coords, radius = HOME_RADIUS_KM) {
+  const home = state.ui.homeCoords;
+  if (!home || !coords) return false;
+  return distanceKm(home, coords) <= radius;
+}
+
+export function isTerritoryAroundHome(t, radius = HOME_RADIUS_KM) {
+  return Boolean(t?.coords) && isAroundHome(t.coords, radius);
+}
+
+export function localSightings() {
+  const all = activeSightings();
+  if (!state.ui.homeCoords) return [];
+  return all.filter((s) => {
+    if (s.coords && isAroundHome(s.coords)) return true;
+    return isTerritoryAroundHome(territoryById(s.territoryId));
+  });
+}
+
+export function hottestElsewhere() {
+  const home = state.ui.homeCoords;
+  if (!home) return null;
+  const remote = state.territories.filter((t) => !isTerritoryAroundHome(t));
+  if (!remote.length) return null;
+
+  let best = null;
+  remote.forEach((t) => {
+    const posts = sightingsFor(t.id).length;
+    const score = posts * 24 + vibeScore(t);
+    if (!best || score > best.score) best = { territory: t, posts, score };
+  });
+  if (!best) return null;
+
+  const zone = best.territory.zone;
+  const inZone = remote.filter((t) => t.zone === zone);
+  const zonePosts = inZone.reduce((n, t) => n + sightingsFor(t.id).length, 0);
+  const hottestInZone = [...inZone].sort((a, b) => vibeScore(b) - vibeScore(a) || sightingsFor(b.id).length - sightingsFor(a.id).length)[0];
+  const territory = hottestInZone || best.territory;
+  return {
+    territory,
+    zone,
+    posts: zonePosts,
+    label: territory.name || zone,
+  };
+}
+
+export function fightIsNearby(fight) {
+  const home = state.ui.homeCoords;
+  if (!home || !fight) return false;
+  const a = territoryById(fight.a);
+  const b = territoryById(fight.b);
+  if (!a?.coords || !b?.coords) return false;
+  const mid = [(a.coords[0] + b.coords[0]) / 2, (a.coords[1] + b.coords[1]) / 2];
+  return distanceKm(home, mid) <= FIGHT_RADIUS_KM || distanceKm(home, a.coords) <= FIGHT_RADIUS_KM || distanceKm(home, b.coords) <= FIGHT_RADIUS_KM;
+}
+
+export function localCityThreat() {
+  const local = state.territories.filter((t) => isTerritoryAroundHome(t));
+  if (!local.length) return cityThreat();
+  return clamp(local.reduce((sum, t) => sum + vibeScore(t), 0) / local.length);
+}
 
 /** Tiny catchment that grows with real reports so a quiet sector cannot swallow a distant pin. */
 export function dynamicTerritoryRadiusKm(t) {

@@ -21,7 +21,7 @@
       <div class="search-container" id="searchContainer">
         <div class="search-input-wrap">
           <span class="search-icon">🔍</span>
-          <input type="text" id="locationSearch" placeholder="Search Bangalore, Cyber Hub…" autocomplete="off" />
+          <input type="text" id="locationSearch" placeholder="Search your city, a mall, a market…" autocomplete="off" />
           <button class="search-clear hidden" id="searchClear" aria-label="Clear search">×</button>
         </div>
         <div class="search-results hidden" id="searchResults"></div>
@@ -31,9 +31,12 @@
 
       <div class="header-actions">
         <!-- 18+ NSFW Mode Toggle -->
-        <button class="nsfw-toggle" id="nsfwToggle" title="Toggle 18+ Uncensored / After Dark Mode">
-          <span class="nsfw-icon">🔞</span><span class="nsfw-text">NSFW: OFF</span>
-        </button>
+        <div class="nsfw-wrap">
+          <button class="nsfw-toggle locked" id="nsfwToggle" title="Off on purpose. Not suitable for LinkedIn lol" aria-disabled="true">
+            <span class="nsfw-icon">🔞</span><span class="nsfw-text">NSFW: OFF</span>
+          </button>
+          <span class="nsfw-hint" id="nsfwHint" aria-hidden="true"></span>
+        </div>
 
         <!-- Sound FX Toggle -->
         <button class="sound-toggle" id="soundToggle" title="Toggle Street Sounds">
@@ -48,7 +51,7 @@
     <main>
       <aside class="sidebar" id="liveSidebar">
         <button class="sidebar-close" id="feedClose" type="button" aria-label="Close live feed">×</button>
-        <div class="sidebar-title"><i></i> LIVE INDIA FEED</div>
+        <div class="sidebar-title"><i></i> LIVE FEED</div>
 
         <section class="agent-card" id="agentCard"></section>
 
@@ -127,21 +130,19 @@
       <div id="matchmakerBody"></div>
     </dialog>
 
-    <!-- Briefing Dialog -->
+    <!-- First-run intro -->
     <dialog id="briefingDialog">
-      <div class="briefing">
-        <div class="eyebrow">AUNTY INTELLIGENCE NETWORK · QUICK START</div>
-        <h1>CHAPPRI SPOTTER<sup>™</sup></h1>
-        <p class="lead">A public-service map for avoiding questionable plans.<br /><strong>We have analyzed the vibes. The results are concerning.</strong></p>
-        <ul class="quick-guide">
-          <li><span>🚨</span><p><b>Spot the nonsense.</b> Check an area before you commit to a café, market, or “just one drink.” If the chappri count is alarming, preserve your peace.</p></li>
-          <li><span>🥊</span><p><b>Pick harmless map beef.</b> Tap an area, inspect the live posts, and start a cartoon fight with nearby characters. No real people; only location-level satire.</p></li>
-          <li><span>📡</span><p><b>Find your own chaos.</b> Use the top-right GPS button to return to your location, or search any city. The map comes with a few starter sightings so nobody arrives at an empty party.</p></li>
-          <li><span>🗣️</span><p><b>Read the live feed.</b> See what the field correspondents (and one suspicious balcony uncle) have posted in real time.</p></li>
-        </ul>
-        <p class="fineprint">What makes this special: dramatic location intelligence, community posts, cartoon battles, and zero pretending this is serious.</p>
-        <p class="briefing-risk">🔞 After Dark exists in the top right. Open NSFW at your own risk, lol.</p>
-        <button class="submit" id="briefingStart">I ACCEPT THE VIBES →</button>
+      <div class="briefing tour">
+        <button type="button" class="tour-skip" id="tourSkip">SKIP ALL</button>
+        <div class="tour-step-icon" id="tourIcon">📍</div>
+        <div class="eyebrow" id="tourKicker">STEP 1 OF 5</div>
+        <h1 id="tourTitle">WE NEED YOUR CITY</h1>
+        <p class="lead" id="tourBody">We ask for your location the second you land so the map opens on YOUR city. No random default. Allow GPS, or search a city up top.</p>
+        <div class="tour-dots" id="tourDots"></div>
+        <div class="tour-nav">
+          <button type="button" class="ghost-wide hidden" id="tourBack">BACK</button>
+          <button type="button" class="submit" id="tourNext">NEXT →</button>
+        </div>
       </div>
     </dialog>
 

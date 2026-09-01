@@ -253,7 +253,7 @@ export function playSound(type) {
       osc1.stop(now + 1.2);
       osc2.stop(now + 1.2);
     } else if (type === 'honk') {
-      // Delhi traffic double-honk
+      // traffic double-honk
       [0, 0.12].forEach((offset) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
@@ -308,6 +308,53 @@ export function playSound(type) {
   } catch {
     // Audio context initialization blocked or unsupported; silent fallback
   }
+}
+
+const NAUGHTY_LINE = 'लाडले, मूड बन रहा है बच्चे का, बाद में खुलेगा ये।';
+let teaseAudio = null;
+
+function installedTeaseVoice() {
+  try {
+    const voices = window.speechSynthesis.getVoices() || [];
+    return (
+      voices.find((voice) => /^hi(?:-|_)/i.test(voice.lang) && /female|swara|neural/i.test(voice.name)) ||
+      voices.find((voice) => /^hi(?:-|_)/i.test(voice.lang)) ||
+      null
+    );
+  } catch {
+    return null;
+  }
+}
+
+function speakNaughtyFallback() {
+  if (!('speechSynthesis' in window)) return false;
+  const utterance = new SpeechSynthesisUtterance(NAUGHTY_LINE);
+  const voice = installedTeaseVoice();
+  utterance.lang = voice?.lang || 'hi-IN';
+  if (voice) utterance.voice = voice;
+  utterance.rate = 1.05;
+  utterance.pitch = 1.08;
+  utterance.volume = 0.95;
+  try {
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function playNaughtyTease() {
+  if (state.ui.soundMuted || typeof window === 'undefined') return false;
+  teaseAudio?.pause();
+  const audio = new Audio('/voice/nsfw-tease.mp3?v=2');
+  audio.volume = 0.95;
+  teaseAudio = audio;
+  const played = audio.play();
+  if (played && typeof played.then === 'function') {
+    played.catch(() => speakNaughtyFallback());
+  }
+  return true;
 }
 
 function installedHindiVoice() {

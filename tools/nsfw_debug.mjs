@@ -9,13 +9,14 @@ await page.goto('http://localhost:4173', { waitUntil: 'domcontentloaded' });
 await page.evaluate(() => localStorage.clear());
 await page.reload({ waitUntil: 'domcontentloaded' });
 await page.waitForSelector('.char-icon');
-if (await page.$('#briefingDialog[open]')) await page.click('#briefingStart');
+if (await page.$('#briefingDialog[open]')) await page.click('#tourSkip');
 
-// Enable NSFW
+// NSFW is locked off on purpose — click should tease, not enable
 await page.click('#nsfwToggle');
-await page.waitForFunction(() => document.body.classList.contains('nsfw-mode'));
 const bodyHasNsfw = await page.evaluate(() => document.body.classList.contains('nsfw-mode'));
-console.log('Body has nsfw-mode:', bodyHasNsfw);
+console.log('Body has nsfw-mode (should be false):', bodyHasNsfw);
+const hint = await page.$eval('#nsfwHint', (el) => el.textContent);
+console.log('NSFW tease hint:', hint);
 
 const layerOpts = await page.$$eval('#layerSelect option', opts => opts.map(o => o.textContent));
 console.log('Layer options:', JSON.stringify(layerOpts));

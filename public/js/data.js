@@ -94,7 +94,7 @@ export const NSFW_CATEGORIES = [
   { id: 'thirst-trap', group: '🔞 18+ THIRST TRAPS', label: 'Thirst Trap in the Wild', emoji: '🍑', stat: 'thirst', nsfw: true, line: 'Outfit is 5% cotton, 95% delusion. Eight necks rotated without consent.' },
   { id: 'spicy-siren', group: '🔞 18+ THIRST TRAPS', label: 'Toxic Baddie Tease', emoji: '🌶️', stat: 'thirst', nsfw: true, line: 'Backless dress ending three situationships and one group chat.' },
   { id: 'oyo-commando', group: '🔞 18+ 2-HOUR SPECIALS', label: 'OYO 2-Hour Special', emoji: '🏩', stat: 'oyo', nsfw: true, line: 'Hoodie, cap, sunglasses, 118 minutes. Checkout was emotional.' },
-  { id: 'pool-party', group: '🔞 18+ 2-HOUR SPECIALS', label: 'Wild Terrace Afterparty', emoji: '👙', stat: 'oyo', nsfw: true, line: 'Strictly 18+. Swimwear testing the structural integrity of NCR morals.' },
+  { id: 'pool-party', group: '🔞 18+ 2-HOUR SPECIALS', label: 'Wild Terrace Afterparty', emoji: '👙', stat: 'oyo', nsfw: true, line: 'Strictly 18+. Swimwear testing the structural integrity of local morals.' },
   { id: 'uncle-spying', group: '🔞 18+ DIRTY TEA', label: 'Uncle 4K Spycam', emoji: '😏', stat: 'tea', nsfw: true, line: 'Balcony uncle on 100x zoom, reviewing everyone’s life choices.' },
   { id: 'thirst-comment', group: '🔞 18+ DIRTY TEA', label: 'Spoken Thirst DM', emoji: '🍆', stat: 'tea', nsfw: true, line: '“Hi dear send pic” energy being said out loud at the bar table.' },
   { id: 'midnight-confession', group: '🔞 18+ DIRTY TEA', label: 'Dirty Gossip / Red Flag', emoji: '🚩', stat: 'tea', nsfw: true, line: '“He said he was single. His lock screen is a roka photo.”' },

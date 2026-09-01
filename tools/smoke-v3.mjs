@@ -46,7 +46,7 @@ try {
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForSelector('.char-icon');
     step(`page ${i}: dismiss briefing`);
-    if (await page.$('#briefingDialog[open]')) await page.click('#briefingStart');
+    if (await page.$('#briefingDialog[open]')) await page.click('#tourSkip');
   }
 
   step('both pages ready');
@@ -111,27 +111,16 @@ try {
   check('report form has no photo upload', !(await starter.$('#photo, #vision, #visionCanvas')));
   await starter.keyboard.press('Escape');
 
-  /* --- 5. 18+ NSFW makeout mode --- */
-  step('testing 18+ NSFW mode & teasing categories');
+  /* --- 5. NSFW stays locked, with a tease --- */
+  step('testing NSFW button stays off on purpose');
   await starter.$eval('#nsfwToggle', (el) => el.click());
-  await starter.waitForFunction(() => document.body.classList.contains('nsfw-mode'));
-  check('body has nsfw-mode theme', await starter.evaluate(() => document.body.classList.contains('nsfw-mode')));
-
-  const layerOptions = await starter.$$eval('#layerSelect option', (opts) => opts.map((o) => o.textContent));
-  check('layer dropdown contains after-dark / makeout filters', layerOptions.some((txt) => txt.includes('MAKEOUT') || txt.includes('CASUAL')));
-
-  await starter.select('#layerSelect', 'makeout');
-  await starter.waitForFunction(() => document.querySelectorAll('.char-icon').length > 0 && document.querySelectorAll('.char-icon').length < 22);
-  const makeoutCount = (await starter.$$('.char-icon')).length;
-  check(`makeout filter only shows real makeout spots (${makeoutCount})`, makeoutCount > 0 && makeoutCount < 12);
-
-  await starter.$eval('#reportButton', (el) => el.click());
-  await starter.waitForSelector('#pinBanner:not(.hidden)');
-  await starter.$eval('.char-icon img', (el) => el.click());
-  await starter.waitForSelector('#reportDialog[open] .chip.nsfw-chip');
-  const makeoutChip = await starter.$('.chip[data-id="makeout"]');
-  check('Makeout spot category chip present in report dialog', Boolean(makeoutChip));
-  await starter.keyboard.press('Escape');
+  const stayedOff = await starter.evaluate(() => !document.body.classList.contains('nsfw-mode'));
+  check('NSFW click does not enable after dark', stayedOff);
+  const teaseVisible = await starter.evaluate(() => {
+    const hint = document.querySelector('#nsfwHint');
+    return Boolean(hint?.classList.contains('show') || hint?.textContent);
+  });
+  check('NSFW tease hint appears on click', teaseVisible);
 
   /* --- 6. Cluster clicking --- */
   step('testing incident cluster sticker modal');
@@ -171,7 +160,7 @@ try {
   await phone.evaluate(() => localStorage.clear());
   await phone.reload({ waitUntil: 'domcontentloaded' });
   await phone.waitForSelector('.char-icon');
-  if (await phone.$('#briefingDialog[open]')) await phone.click('#briefingStart');
+  if (await phone.$('#briefingDialog[open]')) await phone.click('#tourSkip');
   await phone.waitForSelector('#feedToggle');
 
   const feedClosed = await phone.evaluate(() => {

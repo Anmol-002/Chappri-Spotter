@@ -149,7 +149,7 @@ function finish() {
   $('#reportBody').innerHTML = `
     <div class="eyebrow">TRANSMISSION COMPLETE</div>
     <h2 class="accepted">REPORT ACCEPTED</h2>
-    <p class="muted">Your contribution has been added to the NCR Vibe Intelligence Network™.</p>
+    <p class="muted">Your contribution has been added to the Vibe Intelligence Network™.</p>
     <div class="result-score">
       <div>
         <small>${result.territory.name.toUpperCase()} · ${cat.label.toUpperCase()} INDEX</small>

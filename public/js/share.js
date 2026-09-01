@@ -40,7 +40,7 @@ export function openShareCard(territoryId) {
   ctx.fillText('CHAPPRI SPOTTER™', 64, 100);
   ctx.fillStyle = '#7c8a88';
   ctx.font = '18px "DM Mono", monospace';
-  ctx.fillText('NCR VIBE INTELLIGENCE NETWORK · CLASSIFIED', 64, 132);
+  ctx.fillText('VIBE INTELLIGENCE NETWORK · CLASSIFIED', 64, 132);
 
   ctx.fillStyle = '#f2f6f4';
   ctx.font = '700 62px "Space Grotesk", sans-serif';

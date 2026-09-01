@@ -2,7 +2,7 @@
 // area face card, and the posts modal.
 import { CATEGORIES, CHARACTERS, MATCHMAKER_PROFILES, ROASTS } from './data.js';
 import { playSound } from './combat.js';
-import { activeLayers, activeSightings, bandFor, characterFor, hasVoted, levelFor, recordRouletteSpin, sightingStatCounts, sightingsFor, state, territoryById, vibeScore } from './state.js';
+import { activeLayers, activeSightings, bandFor, characterFor, hasVoted, homeCoords, homeLabel, hottestElsewhere, levelFor, localSightings, recordRouletteSpin, sightingStatCounts, sightingsFor, state, territoryById, vibeScore } from './state.js';
 import { $, celebrate, el, timeAgo, toast } from './ui.js';
 
 const catOf = (id) => CATEGORIES.find((c) => c.id === id) || CATEGORIES[0];
@@ -17,7 +17,10 @@ export function setupPanels(callbacks) {
 export function renderSidebar() {
   const agent = state.agent;
   const lvl = levelFor(agent.xp);
-  const sightings = activeSightings();
+  const allSightings = activeSightings();
+  const home = homeCoords();
+  const cityName = homeLabel();
+  const sightings = home ? localSightings() : [];
 
   $('#agentCard').innerHTML = `
     <span>YOU: <b>${lvl.name}</b></span>
@@ -25,17 +28,24 @@ export function renderSidebar() {
     <span>${agent.reports} POSTS</span>
     ${state.ui.nsfw ? '<span class="nsfw-pill">🔞 AFTER DARK</span>' : ''}
     ${agent.combo > 1 ? `<span class="combo">🔥 x${agent.combo}</span>` : ''}`;
-  $('#liveCount').textContent = `${state.territories.length} AREAS · ${sightings.length} POSTS LIVE`;
+  $('#liveCount').textContent = `${state.territories.length} AREAS · ${allSightings.length} POSTS LIVE`;
   const dockCount = $('#feedDockCount');
-  if (dockCount) dockCount.textContent = String(sightings.length);
+  if (dockCount) dockCount.textContent = String(home ? sightings.length : allSightings.length);
+  const feedTitle = document.querySelector('#liveSidebar .sidebar-title');
+  if (feedTitle) feedTitle.innerHTML = cityName ? `<i></i> LIVE · ${cityName.toUpperCase()}` : `<i></i> LIVE FEED`;
 
   const feed = sightings.slice(0, 10);
-  $('#feed').innerHTML = feed.length
-    ? feed
-        .map((s) => {
-          const t = territoryById(s.territoryId);
-          const cat = catOf(s.categoryId);
-          return `<article class="feed-item ${s.nsfw ? 'nsfw-item' : ''}" data-focus="${s.territoryId}">
+  let html;
+  if (!home) {
+    html = state.ui.gpsDenied
+      ? `<p class="empty">Location is off, so we refused to dump you in a random metro.<br /><br />Search your city up top, or tap <b>MY LOCATION</b> and allow GPS.</p>`
+      : `<p class="empty">Locking onto your city… Allow location so we land on YOUR streets, not a random metro.</p>`;
+  } else if (feed.length) {
+    html = feed
+      .map((s) => {
+        const t = territoryById(s.territoryId);
+        const cat = catOf(s.categoryId);
+        return `<article class="feed-item ${s.nsfw ? 'nsfw-item' : ''}" data-focus="${s.territoryId}">
               ${s.scan?.image ? `<img src="${s.scan.image}" alt="Pixelated field evidence" />` : `<span class="feed-emoji">${cat.emoji}</span>`}
               <span class="feed-dot ${s.nsfw ? 'nsfw-dot' : ''}"></span>
               <div>
@@ -44,11 +54,27 @@ export function renderSidebar() {
                 <small>${timeAgo(s.at)}${s.up ? ` · 👍 ${s.up}` : ''}</small>
               </div>
             </article>`;
-        })
-        .join('')
-    : `<p class="empty">No field reports yet. The city is suspiciously quiet.<br /><br />Hit <b>+ REPORT SIGHTING</b> and tap the map.</p>`;
+      })
+      .join('');
+  } else {
+    const peek = hottestElsewhere();
+    html = peek
+      ? `<p class="empty">Your streets are suspiciously quiet. Either everyone behaved, or they learned to hide from the map.</p>
+         <article class="elsewhere-card" data-elsewhere="${peek.territory.id}">
+           <b>Let’s show you other cities if you want</b>
+           <p>${peek.label} currently has the highest activity${peek.posts ? ` · ${peek.posts} live posts` : ''}.</p>
+           <button type="button" class="elsewhere-go">SHOW ME ${peek.label.toUpperCase()} →</button>
+         </article>`
+      : `<p class="empty">No field reports yet. The city is suspiciously quiet.<br /><br />Hit <b>+ REPORT SIGHTING</b> and tap the map.</p>`;
+  }
+  $('#feed').innerHTML = html;
 
   $('#feed').onclick = (e) => {
+    const peek = e.target.closest('[data-elsewhere]');
+    if (peek) {
+      hooks.onPeekElsewhere?.(peek.dataset.elsewhere);
+      return;
+    }
     const item = e.target.closest('[data-focus]');
     if (item) hooks.onFocusTerritory?.(item.dataset.focus);
   };
@@ -223,7 +249,7 @@ export function openAreaPostsModal(territoryId, filteredSightings) {
   const areaName = t ? t.name.toUpperCase() : 'INCIDENT CLUSTER';
 
   $('#areaPostsBody').innerHTML = `
-    <div class="eyebrow">📍 FIELD INTELLIGENCE DOSSIER · ${t?.zone || 'NCR'}</div>
+    <div class="eyebrow">📍 FIELD INTELLIGENCE DOSSIER · ${t?.zone || 'FIELD'}</div>
     <h2>${areaName} SIGHTINGS (${posts.length})</h2>
     <p class="muted">All verified incidents and field observations logged in this specific area.</p>
 

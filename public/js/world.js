@@ -52,7 +52,7 @@ const SEED_ROWS = [
   ['saket', 'midnight-confession', 4, 'He said he was single. His lock screen is a roka photo.', 55, true],
   ['khanmarket', 'midnight-confession', 3, 'Wine tasting where the tasting notes were about whose divorce paid for it.', 22, true],
   ['golfcourse', 'looking-now', 3, 'Cold-coffee queue. Lat spread. Also looking. Denies both.', 19, true],
-  ['saket', 'pool-party', 4, 'Terrace afterparty. Swimwear vs NCR morals. Swimwear is winning.', 31, true],
+  ['saket', 'pool-party', 4, 'Terrace afterparty. Swimwear vs local morals. Swimwear is winning.', 31, true],
   ...NATIONAL_STARTER_ROWS.map(([territoryId, , , , , note], index) => [
     territoryId,
     ['chapri', 'aura', 'reel', 'fashion'][index % 4],
@@ -77,7 +77,7 @@ export function seedSightings() {
       down: 0,
       nsfw: Boolean(nsfw),
       at: Date.now() - ((((index + 1) * 7) % 36) + 1) * 9 * 60 * 1000,
-      coords: territory ? [territory.coords[0] + drift, territory.coords[1] - drift] : [28.56, 77.19],
+      coords: territory ? [territory.coords[0] + drift, territory.coords[1] - drift] : [22.5, 79],
       scan: null,
     };
   }).sort((a, b) => b.at - a.at);

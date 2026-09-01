@@ -32,7 +32,7 @@ try {
   await settle(1200);
   await shot(page, '01-briefing');
 
-  await page.click('#briefingStart');
+  await page.click('#tourSkip');
   await settle(900);
   await shot(page, '02-map');
 
@@ -47,9 +47,8 @@ try {
 
   await page.select('#layerSelect', 'chaos');
   await page.$eval('#nsfwToggle', (el) => el.click());
-  await page.waitForFunction(() => document.body.classList.contains('nsfw-mode'));
   await settle(800);
-  await shot(page, '09-after-dark-makeout');
+  await shot(page, '09-nsfw-tease-locked');
 
   const phone = await browser.newPage();
   phone.setDefaultTimeout(12000);
@@ -57,7 +56,7 @@ try {
   await phone.bringToFront();
   await phone.goto(BASE, { waitUntil: 'domcontentloaded' });
   await phone.waitForSelector('.char-icon');
-  if (await phone.$('#briefingDialog[open]')) await phone.click('#briefingStart');
+  if (await phone.$('#briefingDialog[open]')) await phone.click('#tourSkip');
   await settle(1200);
   await shot(phone, '08-phone');
 

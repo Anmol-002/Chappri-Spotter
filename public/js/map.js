@@ -15,6 +15,7 @@ let userMarker = null;
 let picking = false;
 const charMarkers = new Map();
 const fightingIds = new Set();
+const INDIA_CENTER = [22.5, 79];
 
 const MOODS = [
   [96, 'boss'],
@@ -42,8 +43,7 @@ function zoomScale({ selected = false } = {}) {
 
 export function initMap(callbacks) {
   handlers = callbacks;
-  const phone = window.innerWidth < 860;
-  map = L.map('map', { zoomControl: false, minZoom: 4, maxZoom: 18, zoomSnap: 1 }).setView([28.56, 77.19], phone ? 10 : 11);
+  map = L.map('map', { zoomControl: false, minZoom: 4, maxZoom: 18, zoomSnap: 1 }).setView(INDIA_CENTER, 5);
   L.control.zoom({ position: 'bottomright' }).addTo(map);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '' }).addTo(map);
 
@@ -445,8 +445,8 @@ function placeUserMarker(coords) {
 
 let watchId = null;
 
-export function locateMe(onFound, onFail, cached) {
-  if (cached) snapToUser(cached, { instant: true });
+export function locateMe(onFound, onFail, cached, { waitForLive = false } = {}) {
+  if (cached && !waitForLive) snapToUser(cached, { instant: true });
   if (!navigator.geolocation) {
     if (cached) return onFound?.(cached, nearestTerritory(cached));
     return onFail?.();
@@ -455,7 +455,7 @@ export function locateMe(onFound, onFail, cached) {
   navigator.geolocation.getCurrentPosition(
     (p) => {
       const coords = [+p.coords.latitude.toFixed(5), +p.coords.longitude.toFixed(5)];
-      snapToUser(coords, { instant: Boolean(cached) });
+      snapToUser(coords, { instant: Boolean(cached) && !waitForLive });
       onFound?.(coords, nearestTerritory(coords));
     },
     () => {
@@ -516,7 +516,7 @@ export function searchLocations(query) {
         id: lm.territoryId,
         name: lm.name,
         zone: lm.zone,
-        coords: t ? t.coords : [28.56, 77.19],
+        coords: t ? t.coords : INDIA_CENTER,
         vibe: t ? vibeScore(t) : 70,
         band: t ? bandFor(vibeScore(t)) : bandFor(70),
       });

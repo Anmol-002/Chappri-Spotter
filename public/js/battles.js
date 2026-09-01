@@ -40,7 +40,7 @@ function renderChallengers(home) {
 
     <div class="battle-tabs">
       <button class="battle-tab on" id="tabNeighbours">NEARBY NEIGHBOURS (${neighbours.length})</button>
-      <button class="battle-tab" id="tabAll">ALL NCR SECTORS (${otherSectors.length})</button>
+      <button class="battle-tab" id="tabAll">ALL SECTORS (${otherSectors.length})</button>
     </div>
 
     <div class="pick-grid" id="battleGrid">
