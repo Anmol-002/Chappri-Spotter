@@ -611,24 +611,34 @@ window.addEventListener('resize', invalidate);
 
 const TOUR_STEPS = [
   {
+    icon: '🕵️',
+    title: 'SHOULD WE EVEN GO?',
+    body: 'Chappri Spotter is your extremely unserious local vibe desk: check a place before the plan, spot the chaos nearby, and decide whether to pull up or protect your peace.',
+  },
+  {
     icon: '📍',
-    title: 'WE NEED YOUR CITY',
-    body: 'We ask for your location the second you land so the map opens on YOUR city. No random default. Allow GPS, or search a city up top.',
+    title: 'START WITH YOUR CITY',
+    body: 'Allow GPS or search a city up top. Then go full digital nomad: jump to random places, inspect their index, and find out where the vibes are thriving—or filing for bankruptcy.',
+  },
+  {
+    icon: '🚨',
+    title: 'SAW ONE? MARK THE MAP',
+    body: 'Just spotted a chappri, baddie, or another species of public menace? Hit the report button at the top, choose the sighting, drop it on the map, and write the field notes. No names—only vibes.',
   },
   {
     icon: '🗺️',
-    title: 'TAP THE CHAOS',
-    body: 'Each blob is an area, not a person. Tap a character to inspect the vibe, read the posts, and decide if the plan is still a plan.',
-  },
-  {
-    icon: '📡',
-    title: 'YOUR CITY FEED',
-    body: 'The left live index is YOUR city first. If your streets are suspiciously quiet, we will offer the loudest other city — only if you want the field trip.',
+    title: 'TAP ICONS. READ THE TEA.',
+    body: 'Each character blob is an area, not a person. Tap one to see what people posted there, inspect the local vibe, and decide whether the squad is going out or making chai at home.',
   },
   {
     icon: '🥊',
-    title: 'REPORT IT. FIGHT IT.',
-    body: 'Pin a sighting on the map, or start cartoon beef with a neighbour. Fights only play for people actually around that city — someone else’s drama stays on their streets.',
+    title: 'MAKE THE CHARACTERS BEEF',
+    body: 'Open an area and challenge a neighbour to cartoon combat. Share your card after you mark a sighting, then let your group chat debate the evidence like it is a national emergency.',
+  },
+  {
+    icon: '📡',
+    title: 'WATCH THE LIVE INDEX',
+    body: 'The left live index tells you what is happening in your city right now. If your streets are suspiciously quiet, we will offer the loudest other city—only if you want the field trip.',
   },
   {
     icon: '🔞',
