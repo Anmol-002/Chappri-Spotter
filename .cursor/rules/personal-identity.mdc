@@ -1,0 +1,13 @@
+---
+description: Use only the personal GitHub identity Anmol-002. Never use work or Paisabazaar accounts.
+alwaysApply: true
+---
+
+# Personal identity only
+
+This project belongs to the personal GitHub account **Anmol-002**.
+
+- Never use, mention as current, or commit with any Paisabazaar / work email, account, token, or org.
+- Git author/committer for new commits in this repo: `Anmol Ravesh <2021kucp1090@iiitkota.ac.in>` (repo-local config only).
+- Vercel, gh, gist, and other deploy logins must stay on the personal Anmol-002 / anmol-002 accounts.
+- Never write a work/Paisabazaar email into git config. Do not change `--global` git identity.

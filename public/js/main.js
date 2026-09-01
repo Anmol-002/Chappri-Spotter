@@ -495,7 +495,7 @@ function startFight(fight) {
   celebrate(result.levelUp, result.unlocked);
   pushSharedEvent(result.sharedEvent);
   // Keep the event alive long enough for a reconnecting client to receive it.
-  const live = { ...fight, expiresAt: Date.now() + 16_000 };
+  const live = { ...fight, expiresAt: Date.now() + 45_000 };
   seenFights.add(live.id);
   localStorage.setItem(LIVE_KEY, JSON.stringify(live));
   publish({ type: 'fight', fight: live });
@@ -507,12 +507,15 @@ function startFight(fight) {
   });
 }
 
-function observeFight(fight) {
+function observeFight(fight, attempt = 0) {
   if (!fight || fight.expiresAt <= Date.now() || seenFights.has(fight.id)) return;
+  if (!territoryById(fight.a) || !territoryById(fight.b)) {
+    if (attempt < 8) setTimeout(() => observeFight(fight, attempt + 1), 400);
+    return;
+  }
   seenFights.add(fight.id);
   const nearby = fightIsNearby(fight);
-  // Everyone can watch the compact arena, but only local fights interrupt the UI.
-  animateFight(fight, { focus: false, compact: true, announce: nearby });
+  animateFight(fight, { focus: false, compact: nearby ? false : true, announce: nearby });
   if (!nearby) return;
   const a = territoryById(fight.a);
   const b = territoryById(fight.b);

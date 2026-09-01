@@ -297,11 +297,31 @@ export function applySharedEvent(world, event) {
   return false;
 }
 
+export function liveFightsOf(world) {
+  const now = Date.now();
+  const seen = new Set();
+  const list = [];
+  for (const fight of [...(world?.liveFights || []), world?.liveFight]) {
+    if (!fight?.id || fight.expiresAt <= now || seen.has(fight.id)) continue;
+    seen.add(fight.id);
+    list.push(fight);
+  }
+  return list.sort((a, b) => (b.at || 0) - (a.at || 0)).slice(0, 8);
+}
+
+export function rememberLiveFight(world, fight) {
+  if (!world || !fight?.id) return;
+  world.liveFight = fight;
+  world.liveFights = liveFightsOf({ liveFights: [fight, ...(world.liveFights || [])], liveFight: fight });
+}
+
 export function publicWorld(world) {
+  const liveFights = liveFightsOf(world);
   return {
     territories: world.territories,
     sightings: world.sightings,
     battles: world.battles,
-    liveFight: world.liveFight && world.liveFight.expiresAt > Date.now() ? world.liveFight : null,
+    liveFight: liveFights[0] || null,
+    liveFights,
   };
 }

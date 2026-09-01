@@ -62,12 +62,13 @@ export function listenSharedEvents(handlers = {}) {
       const res = await fetch('/api/world', { cache: 'no-store' });
       if (!res.ok) return;
       const world = await res.json();
-      const stamp = `${(world.sightings || []).length}:${world.sightings?.[0]?.id || ''}:${world.liveFight?.id || ''}:${(world.battles || [])[0]?.id || ''}`;
+      const fights = world.liveFights?.length ? world.liveFights : world.liveFight ? [world.liveFight] : [];
+      const stamp = `${(world.sightings || []).length}:${world.sightings?.[0]?.id || ''}:${fights.map((f) => f.id).join(',')}:${(world.battles || [])[0]?.id || ''}`;
       if (stamp === last) return;
       last = stamp;
       const seen = new Set((state.sightings || []).map((s) => s.id));
-      if (world.liveFight) handlers.onFight?.(world.liveFight);
       applyRemoteWorld(world);
+      fights.forEach((fight) => handlers.onFight?.(fight));
       const incoming = (world.sightings || []).find((s) => s?.id && !seen.has(s.id) && !s.mine);
       if (incoming) handlers.onWorldEvent?.({ type: 'report', sighting: incoming });
     } catch {
@@ -80,7 +81,7 @@ export function listenSharedEvents(handlers = {}) {
   // that do not keep SSE streams open reliably.
   const iv = setInterval(tick, 1500);
 
-  if (typeof EventSource !== 'undefined') {
+  if (typeof EventSource !== 'undefined' && !/vercel\.app$/i.test(location.host)) {
     const connect = () => {
       if (stopped || source) return;
       source = new EventSource('/api/live');

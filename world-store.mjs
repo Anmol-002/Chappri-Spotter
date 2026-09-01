@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { applySharedEvent, eventFingerprint, mergeStarterWorld, publicWorld, seedWorld } from './public/js/world.js';
+import { applySharedEvent, eventFingerprint, liveFightsOf, mergeStarterWorld, publicWorld, rememberLiveFight, seedWorld } from './public/js/world.js';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const dataDir = process.env.CHAPPRI_STORE_PATH || join(root, 'data');
@@ -228,6 +228,7 @@ process.on?.('SIGINT', () => {
 });
 
 export async function applyEvent(event) {
+  const heldFights = liveFightsOf(world);
   if (serverless) {
     loadedAt = 0;
     await refreshWorld();
@@ -237,9 +238,11 @@ export async function applyEvent(event) {
   if (fp && recent.has(fp) && event.type !== 'fight') return { ok: false, reason: 'duplicate' };
   if (event.type === 'fight') {
     if (!event.fight?.id) return { ok: false, reason: 'invalid' };
-    world.liveFight = event.fight;
-    // A durable remote write can take seconds. Broadcast the transient fight
-    // immediately so it is still live for connected viewers.
+    world.liveFights = liveFightsOf({
+      liveFights: [...heldFights, ...(world.liveFights || [])],
+      liveFight: world.liveFight,
+    });
+    rememberLiveFight(world, event.fight);
     broadcast(event);
     schedulePersist().catch((err) => console.warn('live fight persist failed:', err.message));
     return { ok: true, liveOnly: true };

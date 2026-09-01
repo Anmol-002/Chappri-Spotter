@@ -36,7 +36,7 @@ function renderChallengers(home) {
   $('#battleBody').innerHTML = `
     <div class="eyebrow">CHOOSE CHALLENGER · LIVE COMBAT ARENA</div>
     <h2>${home.name.toUpperCase()} wants smoke 🥊</h2>
-    <p class="muted">${state.ui.nsfw ? 'Pick a neighbour. They will lean in. No punches. Chemistry only.' : 'Pick a rival sector. Animated punch combos land on the live map — only you see the big arena.'}</p>
+    <p class="muted">${state.ui.nsfw ? 'Pick a neighbour. They will lean in. Anyone nearby sees the same chemistry.' : 'Pick a rival sector. Anyone at this location sees the fight on their map too.'}</p>
 
     <div class="battle-tabs">
       <button class="battle-tab on" id="tabNeighbours">NEARBY NEIGHBOURS (${neighbours.length})</button>
