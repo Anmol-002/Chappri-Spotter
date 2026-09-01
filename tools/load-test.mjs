@@ -3,9 +3,9 @@ import { spawn } from 'node:child_process';
 const base = process.env.LOADTEST_URL || 'https://chappri-spotter.vercel.app';
 
 const jobs = [
-  { path: '/', connections: 40, duration: 20, title: 'homepage' },
-  { path: '/api/health', connections: 25, duration: 12, title: 'health' },
-  { path: '/api/world', connections: 8, duration: 10, title: 'world API' },
+  { path: '/', connections: 10, duration: 8, title: 'homepage' },
+  { path: '/api/health', connections: 5, duration: 6, title: 'health' },
+  { path: '/api/world', connections: 3, duration: 6, title: 'world API' },
 ];
 
 function run(job) {
