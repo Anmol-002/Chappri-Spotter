@@ -6,7 +6,7 @@ import { hideDossier, openAreaPostsModal, renderDossier, renderLegend, renderSid
 import { beginReport, cancelPin, chooseReportLocation, onPinMoved, onPinPlaced, setupReport } from './report.js';
 import { openShareCard } from './share.js';
 import { hydrateSharedWorld, listenSharedEvents, pushSharedEvent } from './sync.js';
-import { activeLayers, bandFor, cityThreat, fightIsNearby, homeCoords, homeLabel, isTerritoryAroundHome, levelFor, load, localCityThreat, markBriefingSeen, markGpsDenied, recordBattle, reloadData, resetAll, setHomeLocation, setLayer, setNsfwMode, setSelected, setSoundMuted, state, subscribe, territoryById, vibeScore, voteSighting } from './state.js';
+import { activeLayers, bandFor, cityThreat, homeCoords, homeLabel, isTerritoryAroundHome, levelFor, load, localCityThreat, markBriefingSeen, markGpsDenied, recordBattle, reloadData, resetAll, setHomeLocation, setLayer, setNsfwMode, setSelected, setSoundMuted, state, subscribe, territoryById, vibeScore, voteSighting } from './state.js';
 import { $, celebrate, toast, wireDialogClose } from './ui.js';
 
 load();
@@ -90,7 +90,6 @@ function applyHome(coords, near) {
   });
   setGpsLive(true, near?.inRadius ? near.territory.name : 'your vicinity');
   alertIfEnteredZone(coords, { force: true });
-  flushPendingFights();
 }
 
 function lockOntoUser({ toastOnFail = true, waitForLive = true } = {}) {
@@ -480,7 +479,6 @@ $('#resetCity').onclick = () => {
 const LIVE_KEY = 'chappri-live-fight';
 const liveChannel = 'BroadcastChannel' in window ? new BroadcastChannel('chappri-live') : null;
 const seenFights = new Set();
-const pendingRemoteFights = [];
 
 function publish(message) {
   liveChannel?.postMessage(message);
@@ -510,11 +508,6 @@ function startFight(fight) {
 
 function observeFight(fight) {
   if (!fight || fight.expiresAt <= Date.now() || seenFights.has(fight.id)) return;
-  if (!homeCoords()) {
-    pendingRemoteFights.push(fight);
-    return;
-  }
-  if (!fightIsNearby(fight)) return;
   seenFights.add(fight.id);
   animateFight(fight, { focus: false, compact: true });
   const a = territoryById(fight.a);
@@ -524,11 +517,6 @@ function observeFight(fight) {
     title: state.ui.nsfw ? 'SITUATIONSHIP ON THE MAP' : 'LIVE BEEF ON THE MAP',
     body: `${a?.name} and ${b?.name} — small pin. Tap it to zoom in.`,
   });
-}
-
-function flushPendingFights() {
-  const queued = pendingRemoteFights.splice(0);
-  queued.forEach(observeFight);
 }
 
 const seenReports = new Set();

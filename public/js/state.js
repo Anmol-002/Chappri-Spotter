@@ -8,7 +8,6 @@ const NEIGHBOUR_RADIUS_KM = 11;
 const MAX_NEIGHBOURS = 5;
 const COMBO_WINDOW_MS = 3 * 60 * 1000;
 export const HOME_RADIUS_KM = 48;
-export const FIGHT_RADIUS_KM = 40;
 
 const listeners = new Set();
 
@@ -314,16 +313,6 @@ export function hottestElsewhere() {
     posts: zonePosts,
     label: territory.name || zone,
   };
-}
-
-export function fightIsNearby(fight) {
-  const home = state.ui.homeCoords;
-  if (!home || !fight) return false;
-  const a = territoryById(fight.a);
-  const b = territoryById(fight.b);
-  if (!a?.coords || !b?.coords) return false;
-  const mid = [(a.coords[0] + b.coords[0]) / 2, (a.coords[1] + b.coords[1]) / 2];
-  return distanceKm(home, mid) <= FIGHT_RADIUS_KM || distanceKm(home, a.coords) <= FIGHT_RADIUS_KM || distanceKm(home, b.coords) <= FIGHT_RADIUS_KM;
 }
 
 export function localCityThreat() {
