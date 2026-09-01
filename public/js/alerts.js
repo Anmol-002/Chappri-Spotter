@@ -6,6 +6,7 @@ import { bandFor, distanceKm, nearestTerritory, state, territoryById, vibeScore 
 import { toast } from './ui.js';
 
 const NEARBY_KM = 2.4;
+const CITY_VOICE_KM = 14;
 const GLOBAL_GAP_MS = 80 * 1000;
 const PER_SPOT_GAP_MS = 6 * 60 * 1000;
 const ZONE_GAP_MS = 8 * 60 * 1000;
@@ -124,7 +125,8 @@ export function setGpsLive(on, label) {
 export function alertIfEnteredZone(coords, { force = false } = {}) {
   rememberPosition(coords);
   const near = nearestTerritory(coords);
-  if (!near?.inRadius) {
+  const closeEnough = Boolean(near && (near.inRadius || near.km <= CITY_VOICE_KM));
+  if (!closeEnough) {
     lastTerritoryId = null;
     setGpsLive(true, 'open ground');
     return near;

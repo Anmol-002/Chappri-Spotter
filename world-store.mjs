@@ -78,7 +78,7 @@ function schedulePersist() {
   clearTimeout(persistTimer);
   persistTimer = setTimeout(() => {
     persist().catch((err) => console.warn('world persist failed:', err.message));
-  }, 400);
+  }, 250);
 }
 
 async function persist() {
@@ -89,7 +89,14 @@ async function persist() {
 }
 
 export function bootWorld() {
-  if (!ready) ready = loadWorld();
+  if (!ready) {
+    ready = loadWorld().then(() => {
+      if (!jsonBinId || !jsonBinKey) {
+        console.warn('JSONBin is not configured. Render disk is wiped on deploy — user posts will be replayed from each browser.');
+      }
+      return persist().catch((err) => console.warn('initial persist failed:', err.message));
+    });
+  }
   return ready;
 }
 
@@ -112,6 +119,13 @@ function broadcast(event) {
     }
   }
 }
+
+process.on('SIGTERM', () => {
+  persist().catch(() => {});
+});
+process.on('SIGINT', () => {
+  persist().catch(() => {});
+});
 
 export function applyEvent(event) {
   const fp = eventFingerprint(event);

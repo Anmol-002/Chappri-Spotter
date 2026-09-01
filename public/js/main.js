@@ -1,6 +1,6 @@
 import { alertIfEnteredZone, alertIfNearbySighting, alertIfScouting, getUserCoords, maybeRequestNotifications, readSavedGps, rememberPosition, setGpsLive } from './alerts.js';
 import { openBattlePicker, setupBattles } from './battles.js';
-import { playNaughtyTease, playSound, setAfterDarkAmbience } from './combat.js';
+import { playNaughtyTease, playSound, setAfterDarkAmbience, unlockAudio } from './combat.js';
 import { animateFight, focusCoords, focusTerritory, geocodeSearch, initMap, invalidate, layerOptionsHtml, locateMe, openSightingPopup, popCharacter, renderMap, searchLocations, watchUserPosition, worldPlaceSearch } from './map.js';
 import { hideDossier, openAreaPostsModal, renderDossier, renderLegend, renderSidebar, setupPanels, sightingCard } from './panels.js';
 import { beginReport, cancelPin, onPinMoved, onPinPlaced, setupReport } from './report.js';
@@ -15,6 +15,15 @@ if (state.ui.nsfw) setNsfwMode(false);
 document.body.classList.remove('nsfw-mode');
 updateNsfwBtn();
 updateSoundBtn();
+
+window.addEventListener('pointerdown', unlockAudio, { once: false });
+window.addEventListener('keydown', unlockAudio, { once: false });
+setTimeout(() => {
+  if (!homeCoords()) {
+    markGpsDenied();
+    renderAll();
+  }
+}, 5000);
 
 /* ---------- map ---------- */
 

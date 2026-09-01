@@ -51,23 +51,29 @@ export function renderSidebar() {
   const sectionTitle = document.querySelector('#liveSidebar .section-title');
   if (sectionTitle) sectionTitle.innerHTML = `IN YOUR AREA <span>●</span>`;
 
-  let html;
-  if (!home) {
-    html = state.ui.gpsDenied
-      ? `<p class="empty">Location is off, so we refused to dump you in a random metro.<br /><br />Search your city up top, or tap <b>MY LOCATION</b> and allow GPS.</p>`
-      : `<p class="empty">Locking onto your city… Allow location so we land on YOUR streets, not a random metro.</p>`;
-  } else if (local.length) {
-    html = local.slice(0, 10).map(feedCard).join('');
+  let html = '';
+  if (home && local.length) {
+    html = `<div class="area-kicker">IN YOUR AREA${cityName ? ` · ${cityName.toUpperCase()}` : ''}</div>`;
+    html += local.slice(0, 10).map(feedCard).join('');
   } else {
     const peek = hottestElsewhere();
     const place = peek?.label || 'a louder city';
-    html = `<div class="boring-banner">
-        <b>BORING CITY. VERY LESS CHAPPRIS.</b>
-        <p>The ring lights filed for unemployment. Showing you latest intel from ${place} — a place that actually clocked in.</p>
-      </div>`;
-    if (remote.length) {
-      html += remote.slice(0, 10).map(feedCard).join('');
-    } else if (peek) {
+    const extras = (home ? remote : allSightings).slice(0, 10);
+    if (!home && !state.ui.gpsDenied) {
+      html = `<div class="area-kicker">IN YOUR AREA</div>
+        <div class="boring-banner">
+          <b>FINDING YOUR STREETS…</b>
+          <p>Allow location, or search a city. Meanwhile, here is the live country feed so you are not staring at an empty desk.</p>
+        </div>`;
+    } else {
+      html = `<div class="area-kicker">IN YOUR AREA${cityName ? ` · ${cityName.toUpperCase()}` : ''}</div>
+        <div class="boring-banner">
+          <b>BORING CITY. VERY LESS CHAPPRIS.</b>
+          <p>The ring lights filed for unemployment. Showing you latest intel from ${place} — a place that actually clocked in.</p>
+        </div>`;
+    }
+    if (extras.length) html += extras.map(feedCard).join('');
+    else if (peek) {
       html += `<article class="elsewhere-card" data-elsewhere="${peek.territory.id}">
            <button type="button" class="elsewhere-go">SHOW ME ${peek.label.toUpperCase()} →</button>
          </article>`;

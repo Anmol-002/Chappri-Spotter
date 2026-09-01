@@ -439,6 +439,12 @@ main { height: calc(100dvh - 64px); flex: 1; min-height: 0; display: flex; }
 }
 .elsewhere-go:hover { background: var(--lime); color: #07100d; }
 
+.area-kicker {
+  font: 700 10px var(--mono);
+  letter-spacing: 1.2px;
+  color: var(--lime);
+  padding: 4px 0 8px;
+}
 .boring-banner {
   margin: 0 0 10px;
   padding: 11px 12px;
@@ -558,7 +564,14 @@ main { height: calc(100dvh - 64px); flex: 1; min-height: 0; display: flex; }
 
 /* characters on the map */
 
-.char-icon { background: none !important; border: 0 !important; pointer-events: none; }
+.leaflet-pane.leaflet-chars-pane,
+.leaflet-pane.leaflet-fights-pane,
+.leaflet-pane.leaflet-sightings-pane,
+.leaflet-pane.leaflet-gps-pane,
+.leaflet-pane.leaflet-heat-pane {
+  overflow: visible !important;
+}
+.char-icon { background: none !important; border: 0 !important; pointer-events: auto; }
 .char-body { position: relative; width: var(--size); height: var(--size); }
 
 .char-body img {
@@ -594,7 +607,7 @@ main { height: calc(100dvh - 64px); flex: 1; min-height: 0; display: flex; }
   color: #c3cfcb;
 }
 .char-tag em { font-style: normal; font-weight: 700; }
-.char-icon.fighting { opacity: 0; transition: opacity 0.25s; }
+.char-icon.fighting { opacity: 0.28; transition: opacity 0.25s; }
 .char-tag.mini b { display: none; }
 .char-icon:hover .char-tag.mini b { display: inline; }
 .small-zoom .char-tag { display: none; }

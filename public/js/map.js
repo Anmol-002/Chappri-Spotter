@@ -47,11 +47,12 @@ export function initMap(callbacks) {
   L.control.zoom({ position: 'bottomright' }).addTo(map);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '' }).addTo(map);
 
-  map.createPane('heat').style.zIndex = 350;
-  map.createPane('gps').style.zIndex = 400;
-  map.createPane('chars').style.zIndex = 600;
-  map.createPane('sightings').style.zIndex = 650;
-  map.createPane('fights').style.zIndex = 750;
+  const panes = { heat: 350, gps: 400, chars: 600, sightings: 650, fights: 750 };
+  Object.entries(panes).forEach(([name, z]) => {
+    const pane = map.createPane(name);
+    pane.style.zIndex = String(z);
+    pane.style.overflow = 'visible';
+  });
 
   heatLayer = L.layerGroup().addTo(map);
   pinLayer = L.layerGroup().addTo(map);
@@ -63,8 +64,12 @@ export function initMap(callbacks) {
     handlers.onBlankClick?.();
   });
   map.on('zoomend', () => {
-    resizeCharacters();
+    if (!charMarkers.size && state.territories.length) drawCharacters();
+    else resizeCharacters();
     drawSightings();
+  });
+  map.on('moveend', () => {
+    if (!charMarkers.size && state.territories.length) drawCharacters();
   });
   return map;
 }
@@ -167,6 +172,7 @@ function characterIcon(t) {
   const scale = zoomScale({ selected });
   let size = Math.round((46 + score * 0.42) * scale);
   if (selected) size = Math.round(Math.max(size * (phone ? 1.12 : 1.45), phone ? 58 : 68));
+  size = Math.max(phone ? 30 : 36, size);
   const layerLeader = state.ui.layerLeader === t.id;
   const mini = map.getZoom() < 12 && !selected;
   return L.divIcon({
@@ -375,6 +381,12 @@ export function animateFight(fight, { focus = false, compact = false, onDone } =
 
   fightingIds.add(a.id).add(b.id);
   resizeCharacters();
+  setTimeout(() => {
+    fightingIds.delete(a.id);
+    fightingIds.delete(b.id);
+    if (charMarkers.size) resizeCharacters();
+    else drawCharacters();
+  }, 9000);
 
   const note = document.querySelector('#liveFightNote');
   if (note) {

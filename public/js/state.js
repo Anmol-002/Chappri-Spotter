@@ -133,10 +133,24 @@ export function resetAll() {
 
 export function applyRemoteWorld(world) {
   if (!world?.territories?.length) return;
-  const currentWorld = mergeStarterWorld(world);
-  state.territories = currentWorld.territories;
-  state.sightings = decorateSightings(currentWorld.sightings);
-  state.battles = currentWorld.battles;
+  const incoming = mergeStarterWorld(world);
+  const seenIds = new Set((incoming.sightings || []).map((s) => s.id));
+  const localExtras = (state.sightings || []).filter((s) => s?.id && !seenIds.has(s.id));
+  const territories = [...incoming.territories];
+  const known = new Set(territories.map((t) => t.id));
+  state.territories.forEach((t) => {
+    if (t?.id && !known.has(t.id)) {
+      territories.push(t);
+      known.add(t.id);
+    }
+  });
+  const sightings = decorateSightings([...localExtras, ...(incoming.sightings || [])]).sort((a, b) => (b.at || 0) - (a.at || 0));
+  territories.forEach((t) => {
+    t.reports = sightings.filter((s) => s.territoryId === t.id).length;
+  });
+  state.territories = territories;
+  state.sightings = sightings;
+  state.battles = incoming.battles?.length ? incoming.battles : state.battles;
   emit({ type: 'hydrate' });
 }
 

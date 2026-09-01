@@ -5,6 +5,16 @@ import { VOICE_LINES } from './voice-lines.js';
 
 /* ---------- Procedural Web Audio Synthesizer ---------- */
 let audioCtx = null;
+let pendingVoice = null;
+
+export function unlockAudio() {
+  getAudioContext();
+  if (pendingVoice) {
+    const queued = pendingVoice;
+    pendingVoice = null;
+    speakCharacterLine(queued.charKey, { fight: queued.fight });
+  }
+}
 
 function getAudioContext() {
   if (!audioCtx && typeof window !== 'undefined') {
@@ -384,7 +394,10 @@ export function speakCharacterLine(charKey, { fight = false } = {}) {
   const audio = new Audio(voiceSrc(charKey, fight, variant));
   audio.volume = fight ? 0.92 : 0.72;
   currentVoiceAudio = audio;
-  audio.play().catch(() => speakDeviceFallback(charKey, fight));
+  audio.play().catch(() => {
+    pendingVoice = { charKey, fight };
+    speakDeviceFallback(charKey, fight);
+  });
 }
 
 function speakDeviceFallback(charKey, fight) {
