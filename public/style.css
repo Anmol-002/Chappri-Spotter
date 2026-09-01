@@ -359,7 +359,7 @@ sup { color: var(--lime); font-size: 7px; }
 
 .report-button:hover { background: #e6ff7c; transform: translateY(-1px); }
 .report-button:active { transform: translateY(1px); }
-.report-short, .locate-short { display: none; }
+.report-short, .locate-short, .fight-short { display: none; }
 
 /* ---------------- layout ---------------- */
 
@@ -438,6 +438,15 @@ main { height: calc(100dvh - 64px); flex: 1; min-height: 0; display: flex; }
   cursor: pointer;
 }
 .elsewhere-go:hover { background: var(--lime); color: #07100d; }
+
+.boring-banner {
+  margin: 0 0 10px;
+  padding: 11px 12px;
+  border: 1px dashed #5a4a16;
+  background: #16140c;
+}
+.boring-banner b { display: block; color: var(--amber); font-size: 12px; margin-bottom: 5px; letter-spacing: 0.3px; }
+.boring-banner p { margin: 0; color: #c4b48a; font-size: 12px; line-height: 1.45; }
 
 .privacy-note { font: 9px var(--mono); color: #6d7b77; border-top: 1px solid var(--line); padding-top: 12px; line-height: 1.6; }
 .privacy-note span { color: #4c5955; }
@@ -1934,8 +1943,8 @@ textarea {
   .nsfw-icon { font-size: 16px; line-height: 1; }
   .nsfw-hint { max-width: 160px; font-size: 9px; }
   .sound-toggle { width: 40px; height: 40px; }
-  .report-full, .locate-full { display: none; }
-  .report-short, .locate-short { display: inline; }
+  .report-full, .locate-full, .fight-full { display: none; }
+  .report-short, .locate-short, .fight-short { display: inline; }
   body:has(#searchResults:not(.hidden)) .map-controls,
   body:has(#searchResults:not(.hidden)) .gps-live-pill { visibility: hidden; }
   .stage:has(#map.picking) .map-controls,
@@ -2072,25 +2081,45 @@ textarea {
 
   .map-legend, .map-title { display: none; }
   .char-tag { display: none; }
-  .char-icon.selected .char-tag { display: flex; font-size: 10px; }
-  .char-icon.selected .char-shout { font-size: 11px; }
+  .char-icon.selected .char-tag { display: flex; font-size: 9px; }
+  .char-icon.selected .char-shout { display: none; }
 
   .dossier {
     left: 0;
     right: 0;
     bottom: 0;
     width: auto;
-    max-height: 38dvh;
-    padding: 12px 12px max(12px, env(safe-area-inset-bottom));
+    max-height: 58dvh;
+    padding: 12px 12px max(10px, env(safe-area-inset-bottom));
     border-radius: 14px 14px 0 0;
+    display: flex;
+    flex-direction: column;
   }
-  .dossier-note { display: none; }
-  .dossier-recent .area-post + .area-post { display: none; }
+  .dossier-note { display: block; font-size: 12px; margin: 6px 0 4px; }
+  .dossier-recent {
+    flex: 1;
+    min-height: 90px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .dossier-recent .area-post + .area-post { display: grid; }
+  .area-post { grid-template-columns: 40px 1fr; padding: 10px 0; }
+  .area-post > span { width: 40px; height: 40px; font-size: 20px; }
+  .area-post b { font-size: 13px; }
+  .area-post p { font-size: 13px; line-height: 1.4; }
   .dossier-head { gap: 10px; }
-  .dossier-avatar-wrap { width: 52px; height: 52px; }
-  .dossier-score { font-size: 24px; }
-  .dossier-actions { position: sticky; bottom: 0; background: #0a1211; padding-top: 8px; }
-  .dossier-actions .submit, .dossier-actions .ghost-wide { min-height: 44px; font-size: 13px; }
+  .dossier-avatar-wrap { width: 44px; height: 44px; }
+  .dossier-score { font-size: 22px; }
+  .dossier-actions {
+    position: static;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    background: transparent;
+    padding-top: 8px;
+    margin-top: 6px;
+  }
+  .dossier-actions .submit, .dossier-actions .ghost-wide { min-height: 40px; font-size: 11px; padding: 8px 6px; }
 
   .toast-stack {
     left: 8px;
@@ -2127,7 +2156,7 @@ textarea {
   }
 
   .leaflet-bottom.leaflet-right { margin-bottom: max(56px, calc(env(safe-area-inset-bottom) + 48px)); }
-  body:has(#dossier:not(.hidden)) .leaflet-bottom.leaflet-right { margin-bottom: calc(38dvh + 12px); }
+  body:has(#dossier:not(.hidden)) .leaflet-bottom.leaflet-right { margin-bottom: calc(58dvh + 12px); }
   body.feed-open .leaflet-bottom.leaflet-right { margin-bottom: calc(74dvh + 8px); }
   .leaflet-bar a { width: 36px !important; height: 36px !important; line-height: 36px !important; font-size: 18px !important; }
   .search-item { min-height: 52px; padding: 12px; }

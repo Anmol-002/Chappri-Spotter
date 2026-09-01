@@ -1,5 +1,6 @@
 // Nearby, enter-area, and "you're looking at this sector" alerts.
 // Funny, rare, never a firehose — phone-in-pocket friendly.
+import { speakCharacterLine } from './combat.js';
 import { CATEGORIES } from './data.js';
 import { bandFor, distanceKm, nearestTerritory, state, territoryById, vibeScore } from './state.js';
 import { toast } from './ui.js';
@@ -99,12 +100,13 @@ function flavorFor(t) {
   };
 }
 
-function briefTerritory(t, { tagPrefix, force = false } = {}) {
+function briefTerritory(t, { tagPrefix, force = false, voice = true } = {}) {
   if (!t) return false;
   if (!force && tooSoon(lastZoneAlertAt, t.id, ZONE_GAP_MS)) return false;
   if (force) lastZoneAlertAt.set(t.id, Date.now());
   const flavor = flavorFor(t);
   ping({ ...flavor, tag: `${tagPrefix || 'zone'}-${t.id}`, tone: 'alert' });
+  if (voice) speakCharacterLine('uncle');
   return true;
 }
 
@@ -153,7 +155,7 @@ export function alertIfScouting(territoryOrId) {
   const score = vibeScore(t);
   const spicy = (t.stats.baddie || 0) >= 55 || (t.stats.chaos || 0) >= 55 || (t.stats.makeout || 0) >= 55 || score >= 50;
   if (!spicy) return;
-  briefTerritory(t, { tagPrefix: 'scout' });
+  briefTerritory(t, { tagPrefix: 'scout', voice: false });
 }
 
 export function alertIfNearbySighting({ territoryId, category, intensity = 3, coords, mine = false }) {

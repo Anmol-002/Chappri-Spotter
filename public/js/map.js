@@ -166,7 +166,7 @@ function characterIcon(t) {
   const selected = state.ui.selected === t.id;
   const scale = zoomScale({ selected });
   let size = Math.round((46 + score * 0.42) * scale);
-  if (selected) size = Math.round(Math.max(size * (phone ? 1.55 : 1.45), phone ? 92 : 68));
+  if (selected) size = Math.round(Math.max(size * (phone ? 1.12 : 1.45), phone ? 58 : 68));
   const layerLeader = state.ui.layerLeader === t.id;
   const mini = map.getZoom() < 12 && !selected;
   return L.divIcon({
@@ -301,7 +301,9 @@ export function focusTerritory(id, zoom = 13) {
   const t = state.territories.find((x) => x.id === id);
   if (!t || !map) return;
   map.stop();
-  map.flyTo(t.coords, zoom, { duration: 0.7 });
+  const phone = window.innerWidth < 860;
+  const coords = phone ? [t.coords[0] + 0.007, t.coords[1]] : t.coords;
+  map.flyTo(coords, zoom, { duration: 0.7 });
 }
 
 export function focusCoords(coords, zoom = 14) {

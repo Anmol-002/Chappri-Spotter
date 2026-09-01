@@ -266,6 +266,15 @@ export function localSightings() {
   });
 }
 
+export function elsewhereSightings() {
+  const all = activeSightings();
+  if (!state.ui.homeCoords) return all;
+  return all.filter((s) => {
+    if (s.coords && isAroundHome(s.coords)) return false;
+    return !isTerritoryAroundHome(territoryById(s.territoryId));
+  });
+}
+
 export function hottestElsewhere() {
   const home = state.ui.homeCoords;
   if (!home) return null;

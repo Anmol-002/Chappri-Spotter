@@ -2,7 +2,7 @@
 // area face card, and the posts modal.
 import { CATEGORIES, CHARACTERS, MATCHMAKER_PROFILES, ROASTS } from './data.js';
 import { playSound } from './combat.js';
-import { activeLayers, activeSightings, bandFor, characterFor, hasVoted, homeCoords, homeLabel, hottestElsewhere, levelFor, localSightings, recordRouletteSpin, sightingStatCounts, sightingsFor, state, territoryById, vibeScore } from './state.js';
+import { activeLayers, activeSightings, bandFor, characterFor, elsewhereSightings, hasVoted, homeCoords, homeLabel, hottestElsewhere, levelFor, localSightings, recordRouletteSpin, sightingStatCounts, sightingsFor, state, territoryById, vibeScore } from './state.js';
 import { $, celebrate, el, timeAgo, toast } from './ui.js';
 
 const catOf = (id) => CATEGORIES.find((c) => c.id === id) || CATEGORIES[0];
@@ -14,13 +14,28 @@ export function setupPanels(callbacks) {
 
 /* ---------- sidebar ---------- */
 
+function feedCard(s) {
+  const t = territoryById(s.territoryId);
+  const cat = catOf(s.categoryId);
+  return `<article class="feed-item ${s.nsfw ? 'nsfw-item' : ''}" data-focus="${s.territoryId}">
+              ${s.scan?.image ? `<img src="${s.scan.image}" alt="Pixelated field evidence" />` : `<span class="feed-emoji">${cat.emoji}</span>`}
+              <span class="feed-dot ${s.nsfw ? 'nsfw-dot' : ''}"></span>
+              <div>
+                <b>${cat.emoji} ${cat.label.toUpperCase()} ${s.nsfw ? '<em class="nsfw-tag">18+</em>' : ''}</b>
+                <p>${t ? t.name : 'Unknown sector'} · “${s.note}”</p>
+                <small>${timeAgo(s.at)}${s.up ? ` · 👍 ${s.up}` : ''}</small>
+              </div>
+            </article>`;
+}
+
 export function renderSidebar() {
   const agent = state.agent;
   const lvl = levelFor(agent.xp);
   const allSightings = activeSightings();
   const home = homeCoords();
   const cityName = homeLabel();
-  const sightings = home ? localSightings() : [];
+  const local = home ? localSightings() : [];
+  const remote = home ? elsewhereSightings() : [];
 
   $('#agentCard').innerHTML = `
     <span>YOU: <b>${lvl.name}</b></span>
@@ -30,42 +45,35 @@ export function renderSidebar() {
     ${agent.combo > 1 ? `<span class="combo">🔥 x${agent.combo}</span>` : ''}`;
   $('#liveCount').textContent = `${state.territories.length} AREAS · ${allSightings.length} POSTS LIVE`;
   const dockCount = $('#feedDockCount');
-  if (dockCount) dockCount.textContent = String(home ? sightings.length : allSightings.length);
+  if (dockCount) dockCount.textContent = String(local.length || remote.length || allSightings.length);
   const feedTitle = document.querySelector('#liveSidebar .sidebar-title');
   if (feedTitle) feedTitle.innerHTML = cityName ? `<i></i> LIVE · ${cityName.toUpperCase()}` : `<i></i> LIVE FEED`;
+  const sectionTitle = document.querySelector('#liveSidebar .section-title');
+  if (sectionTitle) sectionTitle.innerHTML = `IN YOUR AREA <span>●</span>`;
 
-  const feed = sightings.slice(0, 10);
   let html;
   if (!home) {
     html = state.ui.gpsDenied
       ? `<p class="empty">Location is off, so we refused to dump you in a random metro.<br /><br />Search your city up top, or tap <b>MY LOCATION</b> and allow GPS.</p>`
       : `<p class="empty">Locking onto your city… Allow location so we land on YOUR streets, not a random metro.</p>`;
-  } else if (feed.length) {
-    html = feed
-      .map((s) => {
-        const t = territoryById(s.territoryId);
-        const cat = catOf(s.categoryId);
-        return `<article class="feed-item ${s.nsfw ? 'nsfw-item' : ''}" data-focus="${s.territoryId}">
-              ${s.scan?.image ? `<img src="${s.scan.image}" alt="Pixelated field evidence" />` : `<span class="feed-emoji">${cat.emoji}</span>`}
-              <span class="feed-dot ${s.nsfw ? 'nsfw-dot' : ''}"></span>
-              <div>
-                <b>${cat.emoji} ${cat.label.toUpperCase()} ${s.nsfw ? '<em class="nsfw-tag">18+</em>' : ''}</b>
-                <p>${t ? t.name : 'Unknown sector'} · “${s.note}”</p>
-                <small>${timeAgo(s.at)}${s.up ? ` · 👍 ${s.up}` : ''}</small>
-              </div>
-            </article>`;
-      })
-      .join('');
+  } else if (local.length) {
+    html = local.slice(0, 10).map(feedCard).join('');
   } else {
     const peek = hottestElsewhere();
-    html = peek
-      ? `<p class="empty">Your streets are suspiciously quiet. Either everyone behaved, or they learned to hide from the map.</p>
-         <article class="elsewhere-card" data-elsewhere="${peek.territory.id}">
-           <b>Let’s show you other cities if you want</b>
-           <p>${peek.label} currently has the highest activity${peek.posts ? ` · ${peek.posts} live posts` : ''}.</p>
+    const place = peek?.label || 'a louder city';
+    html = `<div class="boring-banner">
+        <b>BORING CITY. VERY LESS CHAPPRIS.</b>
+        <p>The ring lights filed for unemployment. Showing you latest intel from ${place} — a place that actually clocked in.</p>
+      </div>`;
+    if (remote.length) {
+      html += remote.slice(0, 10).map(feedCard).join('');
+    } else if (peek) {
+      html += `<article class="elsewhere-card" data-elsewhere="${peek.territory.id}">
            <button type="button" class="elsewhere-go">SHOW ME ${peek.label.toUpperCase()} →</button>
-         </article>`
-      : `<p class="empty">No field reports yet. The city is suspiciously quiet.<br /><br />Hit <b>+ REPORT SIGHTING</b> and tap the map.</p>`;
+         </article>`;
+    } else {
+      html += `<p class="empty">Even the other cities are behaving. Hit <b>+ REPORT SIGHTING</b> and ruin the peace.</p>`;
+    }
   }
   $('#feed').innerHTML = html;
 
@@ -134,7 +142,7 @@ export function renderDossier(id) {
       ${
         recent.length
           ? recent
-              .slice(0, 2)
+              .slice(0, 4)
               .map(
                 (s) => `<article class="area-post ${s.nsfw ? 'nsfw-post' : ''}" data-sighting="${s.id}">
             <span>${catOf(s.categoryId).emoji}</span>
@@ -152,8 +160,8 @@ export function renderDossier(id) {
     </div>
 
     <div class="dossier-actions">
-      <button class="submit" data-act="report">+ REPORT HERE</button>
-      <button class="ghost-wide fight-button" data-act="battle">${nsfw ? '💋 START A SITUATIONSHIP' : '🥊 CHALLENGE A NEIGHBOUR'}</button>
+      <button class="submit" data-act="report"><span class="report-full">+ REPORT HERE</span><span class="report-short">+ REPORT</span></button>
+      <button class="ghost-wide fight-button" data-act="battle">${nsfw ? '💋 START A SITUATIONSHIP' : '<span class="fight-full">🥊 CHALLENGE A NEIGHBOUR</span><span class="fight-short">🥊 FIGHT</span>'}</button>
     </div>`;
 
   box.querySelector('.dossier-x').onclick = () => hooks.onCloseDossier?.();
